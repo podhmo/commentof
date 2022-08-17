@@ -45,7 +45,7 @@ func (c *Collector) CollectFromFile(f *File, t *ast.File) error {
 		switch decl := decl.(type) {
 		case *ast.BadDecl:
 		case *ast.FuncDecl:
-			if err := c.CollectFromFuncDecl(f, decl); err != nil {
+			if err := c.CollectFromFuncDecl(f, t, decl); err != nil {
 				return err
 			}
 		case *ast.GenDecl:
@@ -57,19 +57,32 @@ func (c *Collector) CollectFromFile(f *File, t *ast.File) error {
 			continue
 		}
 	}
-
-	for _, cg := range t.Comments {
-		log.Println(cg.Text())
-	}
 	return nil
 }
 
-func (c *Collector) CollectFromFuncDecl(f *File, decl *ast.FuncDecl) error {
+func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl) error {
 	name := decl.Name.Name
 	f.Names = append(f.Names, name)
 
 	argNames := []string{}
 	args := map[string]*Field{}
+	var comments []*ast.CommentGroup
+	idx := 0
+	{
+		start := decl.Type.Params.Opening
+		end := decl.Type.Params.Closing
+		for i, cg := range t.Comments {
+			if cg.End() < start {
+				continue
+			}
+			if end < cg.Pos() {
+				idx = i
+				break
+			}
+			comments = append(comments, cg)
+		}
+	}
+
 	for i, x := range decl.Type.Params.List {
 		name := ""
 		id := ""
@@ -77,18 +90,51 @@ func (c *Collector) CollectFromFuncDecl(f *File, decl *ast.FuncDecl) error {
 			name = x.Names[0].Name
 			id = name
 		} else {
-			id = fmt.Sprintf("arg%d", i)
+			id = fmt.Sprintf("$arg%d", i)
+		}
+
+		doc := ""
+		for _, cg := range comments {
+			// fmt.Println(f.Names[len(f.Names)-1], id, "@@", x.Pos(), x.End(), "@", cg.Pos(), cg.End(), "--", strings.TrimSpace(cg.Text()))
+			if x.Pos() < cg.Pos() && cg.End() < x.End() {
+				doc += cg.Text()
+				// fmt.Println(f.Names[len(f.Names)-1], id, "-#", x.Pos(), x.End(), "@", cg.Pos(), cg.End(), "--", strings.TrimSpace(cg.Text()))
+				continue
+			}
+			if x.End() < cg.Pos() {
+				// fmt.Println(f.Names[len(f.Names)-1], id, "--", x.Pos(), x.End(), "@", cg.Pos(), cg.End(), "--", strings.TrimSpace(cg.Text()))
+				doc += cg.Text()
+				break
+			}
 		}
 
 		argNames = append(argNames, id)
 		args[id] = &Field{
-			Name: name,
-			// TODO: doc
+			Name:    name,
+			Comment: doc,
 		}
+	}
+	{
+		// TODO: last
 	}
 
 	returnNames := []string{}
 	returns := map[string]*Field{}
+	comments = nil
+	{
+		start := decl.Type.Results.Opening
+		end := decl.Type.Results.Closing
+		for _, cg := range t.Comments[idx:] {
+			if cg.End() < start {
+				continue
+			}
+			if end < cg.Pos() {
+				break
+			}
+			comments = append(comments, cg)
+		}
+	}
+
 	for i, x := range decl.Type.Results.List {
 		name := ""
 		id := ""
@@ -96,13 +142,27 @@ func (c *Collector) CollectFromFuncDecl(f *File, decl *ast.FuncDecl) error {
 			name = x.Names[0].Name
 			id = name
 		} else {
-			id = fmt.Sprintf("ret%d", i)
+			id = fmt.Sprintf("$ret%d", i)
 		}
 
 		returnNames = append(returnNames, id)
+		doc := ""
+		for _, cg := range comments {
+			// fmt.Println(f.Names[len(f.Names)-1], id, "@@", x.Pos(), x.End(), "@", cg.Pos(), cg.End(), "--", strings.TrimSpace(cg.Text()))
+			if x.Pos() < cg.Pos() && cg.End() < x.End() {
+				doc += cg.Text()
+				// fmt.Println(f.Names[len(f.Names)-1], id, "-#", x.Pos(), x.End(), "@", cg.Pos(), cg.End(), "--", strings.TrimSpace(cg.Text()))
+				continue
+			}
+			if x.End() < cg.Pos() {
+				// fmt.Println(f.Names[len(f.Names)-1], id, "--", x.Pos(), x.End(), "@", cg.Pos(), cg.End(), "--", strings.TrimSpace(cg.Text()))
+				doc += cg.Text()
+				break
+			}
+		}
 		returns[id] = &Field{
-			Name: name,
-			// TODO: doc
+			Name:    name,
+			Comment: doc,
 		}
 	}
 
