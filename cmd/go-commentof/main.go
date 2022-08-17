@@ -12,14 +12,15 @@ import (
 )
 
 func main() {
-	if err := run(); err != nil {
-		log.Printf("!! %+v", err)
+	for _, dirname := range os.Args[1:] {
+		if err := run(dirname); err != nil {
+			log.Printf("!! %+v", err)
+		}
 	}
 }
 
-func run() error {
+func run(dirname string) error {
 	fset := token.NewFileSet()
-	dirname := "./testdata/fixture"
 	tree, err := parser.ParseDir(fset, dirname, nil, parser.ParseComments)
 	if err != nil {
 		return fmt.Errorf("parse dir: %w", err)
@@ -33,7 +34,9 @@ func run() error {
 
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "	")
-		fmt.Println(enc.Encode(result))
+		if err := enc.Encode(result); err != nil {
+			return fmt.Errorf("encode json: %w", err)
+		}
 	}
 	return nil
 }
