@@ -1,51 +1,26 @@
-package main
+package commentof
 
 import (
 	"fmt"
 	"go/ast"
-	"go/parser"
 	"go/token"
 	"log"
 	"strings"
 )
 
-func main() {
-	if err := run(); err != nil {
-		log.Printf("!! %+v", err)
-	}
-}
-
-func run() error {
-	fset := token.NewFileSet()
-	// filename := "./testdata/fixture/struct.go"
-	// filename := "./testdata/fixture/const.go"
-	filename := "./testdata/fixture/embedded.go"
-
-	tree, err := parser.ParseFile(fset, filename, nil, parser.ParseComments)
-	if err != nil {
-		return fmt.Errorf("parse file: %w", err)
-	}
-
-	f, err := Collect(fset, tree)
-	if err != nil {
-		return fmt.Errorf("collect: file=%s, %w", filename, err)
-	}
-	fmt.Println(f)
-	return nil
-}
-
-func Collect(fset *token.FileSet, t *ast.File) (*File, error) {
+func FileAST(fset *token.FileSet, t *ast.File) (*File, error) {
 	for _, cg := range t.Comments {
 		log.Println(strings.TrimSpace(cg.Text()))
 	}
 	log.Println("----------------------------------------")
-	c := &collector{fset: fset}
+	c := &collector{fset: fset, dot: "."}
 	f := &File{structMap: map[string]*Struct{}}
 	return f, c.CollectFromFile(f, t)
 }
 
 type collector struct {
 	fset *token.FileSet
+	dot  string
 }
 
 func (c *collector) CollectFromFile(f *File, t *ast.File) error {
@@ -85,10 +60,14 @@ func (c *collector) CollectFromTypeSpec(f *File, decl *ast.GenDecl, spec *ast.Ty
 	name := spec.Name.Name
 	f.Names = append(f.Names, name)
 	s := &Struct{
-		Name: name,
-		Decl: decl,
-		Spec: spec,
+		Name:    name,
+		Doc:     spec.Doc,
+		Comment: spec.Comment,
 	}
+	if s.Doc == nil && decl.Doc != nil {
+		s.Doc = decl.Doc
+	}
+
 	f.structMap[name] = s
 	switch typ := spec.Type.(type) {
 	case *ast.Ident:
@@ -96,7 +75,7 @@ func (c *collector) CollectFromTypeSpec(f *File, decl *ast.GenDecl, spec *ast.Ty
 		// type <S> = <S>
 	case *ast.StructType:
 		// type <S> struct { ... }
-		if err := c.CollectFromStructType(s, decl, spec, typ); err != nil {
+		if err := c.CollectFromStructType(f, s, decl, spec, typ); err != nil {
 			return err
 		}
 	default:
@@ -106,7 +85,7 @@ func (c *collector) CollectFromTypeSpec(f *File, decl *ast.GenDecl, spec *ast.Ty
 	return nil
 }
 
-func (c *collector) CollectFromStructType(s *Struct, decl *ast.GenDecl, spec *ast.TypeSpec, typ *ast.StructType) error {
+func (c *collector) CollectFromStructType(f *File, s *Struct, decl *ast.GenDecl, spec *ast.TypeSpec, typ *ast.StructType) error {
 	for _, field := range typ.Fields.List {
 		name := ""
 		anonymous := false
@@ -116,58 +95,56 @@ func (c *collector) CollectFromStructType(s *Struct, decl *ast.GenDecl, spec *as
 			name = fmt.Sprintf("??%T", field.Type) // TODO: NG:embedded
 			anonymous = true
 		}
+
 		s.Fields = append(s.Fields, &Field{
-			Name:      name,
-			Field:     field,
-			Anonymous: anonymous,
+			Name:     name,
+			Doc:      field.Doc,
+			Comment:  field.Comment,
+			Embedded: anonymous,
 		})
+
+		switch typ := field.Type.(type) {
+		case *ast.Ident:
+		case *ast.StructType:
+			// type <S> struct { ... }
+			name := s.Name + c.dot + name
+			f.Names = append(f.Names, name)
+			anonymous := &Struct{
+				Name:    name,
+				Doc:     field.Doc,     // xxx
+				Comment: field.Comment, // xxx
+			}
+			s.Fields[len(s.Fields)-1].Anonymous = anonymous
+			if err := c.CollectFromStructType(f, anonymous, decl, spec, typ); err != nil {
+				return err
+			}
+		default:
+			log.Printf("unexpected decl: %T, spec: %T, type: %T?, field=%s", decl, spec, typ, name)
+
+		}
 	}
 	return nil
 }
 
 type File struct {
-	Names     []string
 	structMap map[string]*Struct
+	Names     []string
 }
 
 type Struct struct {
 	Name   string
 	Fields []*Field
-	Decl   *ast.GenDecl
-	Spec   *ast.TypeSpec
-}
 
-// TODO: see spec
-func (s *Struct) Doc() *ast.CommentGroup {
-	return s.Decl.Doc
-}
-func (s *Struct) Comment() *ast.CommentGroup {
-	return nil
+	Doc     *ast.CommentGroup // decl and spec?
+	Comment *ast.CommentGroup
 }
 
 type Field struct {
 	Name      string
-	Field     *ast.Field
-	Anonymous bool
-}
+	Embedded  bool
+	Anonymous *Struct
 
-// TODO: see spec
-func (s *Field) Doc() *ast.CommentGroup {
-	return s.Field.Doc
+	Doc     *ast.CommentGroup // associated documentation; or nil
+	Comment *ast.CommentGroup // line comments; or nil
+	// TODO: tag
 }
-func (s *Field) Comment() *ast.CommentGroup {
-	return s.Field.Comment
-}
-
-type Target interface {
-	HasDoc
-	HasComment
-}
-type HasDoc interface {
-	Doc() *ast.CommentGroup
-}
-type HasComment interface {
-	Comment() *ast.CommentGroup
-}
-
-var _ Target = (*Struct)(nil)
