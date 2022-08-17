@@ -104,13 +104,13 @@ func (c *collector) CollectFromStructType(f *File, s *Struct, decl *ast.GenDecl,
 		if len(field.Names) > 0 {
 			name = field.Names[0].Name
 		} else {
+			anonymous = true
 			if typename, ok := typeString(field.Type); ok {
 				name = typename
 			} else {
 				name = fmt.Sprintf("??%T", field.Type) // TODO: NG:embedded
 				log.Printf("unexpected embedded field type: %T, spec: %T, struct: %T, field:%v", decl, spec, typ, field.Type)
 			}
-			anonymous = true
 		}
 
 		s.Fields = append(s.Fields, &Field{
