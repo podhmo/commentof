@@ -19,16 +19,16 @@ func main() {
 
 func run() error {
 	fset := token.NewFileSet()
-	filename := "./testdata/fixture/struct.go"
+	// filename := "./testdata/fixture/struct.go"
 	// filename := "./testdata/fixture/const.go"
-	// filename := "./testdata/fixture/embedded.go"
+	filename := "./testdata/fixture/embedded.go"
 
 	tree, err := parser.ParseFile(fset, filename, nil, parser.ParseComments)
 	if err != nil {
 		return fmt.Errorf("parse file: %w", err)
 	}
 
-	f, err := commentof.FileAST(fset, tree)
+	f, err := commentof.File(fset, tree)
 	if err != nil {
 		return fmt.Errorf("collect: file=%s, %w", filename, err)
 	}
