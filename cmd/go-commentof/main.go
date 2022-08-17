@@ -19,6 +19,27 @@ func main() {
 
 func run() error {
 	fset := token.NewFileSet()
+	dirname := "./testdata/fixture"
+	tree, err := parser.ParseDir(fset, dirname, nil, parser.ParseComments)
+	if err != nil {
+		return fmt.Errorf("parse dir: %w", err)
+	}
+
+	for name, p := range tree {
+		result, err := commentof.Package(fset, p)
+		if err != nil {
+			return fmt.Errorf("collect: dir=%s, name=%s, %w", dirname, name, err)
+		}
+
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "	")
+		fmt.Println(enc.Encode(result))
+	}
+	return nil
+}
+
+func RunFile() error {
+	fset := token.NewFileSet()
 	// filename := "./testdata/fixture/struct.go"
 	// filename := "./testdata/fixture/const.go"
 	filename := "./testdata/fixture/embedded.go"
@@ -28,15 +49,15 @@ func run() error {
 		return fmt.Errorf("parse file: %w", err)
 	}
 
-	f, err := commentof.File(fset, tree)
+	result, err := commentof.File(fset, tree)
 	if err != nil {
 		return fmt.Errorf("collect: file=%s, %w", filename, err)
 	}
 
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent("", "	")
-	fmt.Println(enc.Encode(f))
+	fmt.Println(enc.Encode(result))
 
-	// pp.Println(f)
+	// pp.Println(result)
 	return nil
 }

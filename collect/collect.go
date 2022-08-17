@@ -7,9 +7,65 @@ import (
 	"log"
 )
 
+type Package struct {
+	Files   map[string]*File   `json:"-"`
+	Structs map[string]*Struct `json:"structs"`
+
+	FileNames []string `json:"filenames"`
+	Names     []string `json:"names"`
+}
+
+type File struct {
+	Structs map[string]*Struct `json:"structs"`
+	Names   []string           `json:"names"`
+}
+
+type Struct struct {
+	Name   string   `json:"name"`
+	Parent *Struct  `json:"-"`
+	Fields []*Field `json:"fields"`
+
+	Doc     string `json:"doc"`     // associated documentation; or nil (decl or spec?)
+	Comment string `json:"comment"` // line comments; or nil
+}
+
+// func (s *Struct) MarshalJSON() ([]byte, error) {
+// 	type T Struct
+// 	inner := (T)(*s)
+// 	inner.Parent = nil
+// 	return json.Marshal(inner)
+// }
+
+type Field struct {
+	Name      string  `json:"name"`
+	Embedded  bool    `json:"embedded"`
+	Anonymous *Struct `json:"annonymous,omitempty"`
+
+	Doc     string `json:"doc"`     // associated documentation; or nil
+	Comment string `json:"comment"` // line comments; or nil
+	// TODO: tag
+}
+
 type Collector struct {
 	Fset *token.FileSet
 	Dot  string
+}
+
+func (c *Collector) CollectFromPackage(p *Package, t *ast.Package) error {
+	for filename, ft := range t.Files {
+		p.FileNames = append(p.FileNames, filename)
+		f := &File{Structs: map[string]*Struct{}, Names: []string{}}
+		p.Files[filename] = f
+		if err := c.CollectFromFile(f, ft); err != nil {
+			return fmt.Errorf("collect file: %s: %w", filename, err)
+		}
+
+		p.Names = append(p.Names, f.Names...)
+		for name, s := range f.Structs {
+			p.Structs[name] = s
+		}
+	}
+	return nil
 }
 
 func (c *Collector) CollectFromFile(f *File, t *ast.File) error {
@@ -133,35 +189,4 @@ func (c *Collector) CollectFromStructType(f *File, s *Struct, decl *ast.GenDecl,
 		}
 	}
 	return nil
-}
-
-type File struct {
-	Structs map[string]*Struct `json:"structs"`
-	Names   []string           `json:"names"`
-}
-
-type Struct struct {
-	Name   string   `json:"name"`
-	Parent *Struct  `json:"-"`
-	Fields []*Field `json:"fields"`
-
-	Doc     string `json:"doc"`     // associated documentation; or nil (decl or spec?)
-	Comment string `json:"comment"` // line comments; or nil
-}
-
-// func (s *Struct) MarshalJSON() ([]byte, error) {
-// 	type T Struct
-// 	inner := (T)(*s)
-// 	inner.Parent = nil
-// 	return json.Marshal(inner)
-// }
-
-type Field struct {
-	Name      string  `json:"name"`
-	Embedded  bool    `json:"embedded"`
-	Anonymous *Struct `json:"annonymous,omitempty"`
-
-	Doc     string `json:"doc"`     // associated documentation; or nil
-	Comment string `json:"comment"` // line comments; or nil
-	// TODO: tag
 }
