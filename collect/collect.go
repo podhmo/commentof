@@ -243,7 +243,7 @@ func typeString(typ ast.Expr) (string, bool) {
 
 func (c *Collector) CollectFromStructType(f *File, s *Object, decl *ast.GenDecl, spec *ast.TypeSpec, typ *ast.StructType) error {
 	s.Token = token.STRUCT
-	for _, field := range typ.Fields.List {
+	for i, field := range typ.Fields.List {
 		name := ""
 		anonymous := false
 		if len(field.Names) > 0 {
@@ -257,15 +257,19 @@ func (c *Collector) CollectFromStructType(f *File, s *Object, decl *ast.GenDecl,
 				log.Printf("unexpected embedded field type: %T, spec: %T, struct: %T, field:%v", decl, spec, typ, field.Type)
 			}
 		}
+		id := name
+		if id == "" {
+			id = fmt.Sprintf("anon#%d", i)
+		}
 
-		s.FieldNames = append(s.FieldNames, name)
+		s.FieldNames = append(s.FieldNames, id)
 		fieldof := &Field{
 			Name:     name,
 			Doc:      field.Doc.Text(),
 			Comment:  field.Comment.Text(),
 			Embedded: anonymous,
 		}
-		s.Fields[name] = fieldof
+		s.Fields[id] = fieldof
 
 		switch typ := field.Type.(type) {
 		case *ast.Ident, *ast.FuncType, *ast.SelectorExpr:
@@ -310,7 +314,7 @@ func (c *Collector) CollectFromStructType(f *File, s *Object, decl *ast.GenDecl,
 
 func (c *Collector) CollectFromInterfaceType(f *File, s *Object, decl *ast.GenDecl, spec *ast.TypeSpec, typ *ast.InterfaceType) error {
 	s.Token = token.INTERFACE
-	for _, field := range typ.Methods.List {
+	for i, field := range typ.Methods.List {
 		name := ""
 		anonymous := false
 		if len(field.Names) > 0 {
@@ -324,15 +328,19 @@ func (c *Collector) CollectFromInterfaceType(f *File, s *Object, decl *ast.GenDe
 				log.Printf("unexpected embedded field type: %T, spec: %T, struct: %T, field:%v", decl, spec, typ, field.Type)
 			}
 		}
+		id := name
+		if id == "" {
+			id = fmt.Sprintf("anon#%d", i)
+		}
 
-		s.FieldNames = append(s.FieldNames, name)
+		s.FieldNames = append(s.FieldNames, id)
 		fieldof := &Field{
 			Name:     name,
 			Doc:      field.Doc.Text(),
 			Comment:  field.Comment.Text(),
 			Embedded: anonymous,
 		}
-		s.Fields[name] = fieldof
+		s.Fields[id] = fieldof
 
 		switch typ := field.Type.(type) {
 		case *ast.Ident, *ast.FuncType, *ast.SelectorExpr:
