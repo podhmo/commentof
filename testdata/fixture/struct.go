@@ -1,4 +1,4 @@
-package commentof
+package fixture
 
 // toplevel comment 0  :IGNORED:
 
@@ -30,17 +30,8 @@ type S struct {
 	unexportedString string
 } // S is struct @S1
 
-const (
-	// CONSTANT_STRING is constant string @C0
-	CONSTNAT_STRING = ""
+// S2 is struct @S2
+type S2 S
 
-	CONSTNAT_STRING2 = "" // CONSTANT_STRING2 is constant string @C1
-
-	// CONSTANT_STRING3 is constant string @C2
-	CONSTNAT_STRING3 = "" // CONSTANT_STRING3 is constant string  @C3
-)
-
-// CONSTANT_STRING4 is constant string @C4
-const CONSTNAT_STRING4 = ""
-
-const CONSTNAT_STRING5 = "" // CONSTANT_STRING5 is constant string  @C5
+// S3 is struct @S3
+type S3 = S
