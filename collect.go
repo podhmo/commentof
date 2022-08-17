@@ -85,6 +85,18 @@ func (c *collector) CollectFromTypeSpec(f *File, decl *ast.GenDecl, spec *ast.Ty
 	return nil
 }
 
+func typeString(typ ast.Expr) (string, bool) {
+	switch t := typ.(type) {
+	case *ast.Ident:
+		return t.String(), true
+	case *ast.SelectorExpr:
+		name, ok := typeString(t.X)
+		return name + "." + t.Sel.String(), ok
+	default:
+		return "", false
+	}
+}
+
 func (c *collector) CollectFromStructType(f *File, s *Struct, decl *ast.GenDecl, spec *ast.TypeSpec, typ *ast.StructType) error {
 	for _, field := range typ.Fields.List {
 		name := ""
@@ -92,7 +104,12 @@ func (c *collector) CollectFromStructType(f *File, s *Struct, decl *ast.GenDecl,
 		if len(field.Names) > 0 {
 			name = field.Names[0].Name
 		} else {
-			name = fmt.Sprintf("??%T", field.Type) // TODO: NG:embedded
+			if typename, ok := typeString(field.Type); ok {
+				name = typename
+			} else {
+				name = fmt.Sprintf("??%T", field.Type) // TODO: NG:embedded
+				log.Printf("unexpected embedded field type: %T, spec: %T, struct: %T, field:%v", decl, spec, typ, field.Type)
+			}
 			anonymous = true
 		}
 
