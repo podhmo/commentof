@@ -1,6 +1,7 @@
 package fixture
 
 // toplevel comment 1  :IGNORED:
+
 const (
 	// CONSTANT_STRING is constant string @C0
 	CONSTNAT_STRING = ""
