@@ -64,8 +64,8 @@ func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl
 	name := decl.Name.Name
 	f.Names = append(f.Names, name)
 
-	argNames := []string{}
-	args := map[string]*Field{}
+	paramNames := []string{}
+	params := map[string]*Field{}
 	var comments []*ast.CommentGroup
 	idx := 0
 	{
@@ -90,7 +90,7 @@ func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl
 			name = x.Names[0].Name
 			id = name
 		} else {
-			id = fmt.Sprintf("$arg%d", i)
+			id = fmt.Sprintf("param#%d", i)
 		}
 
 		doc := ""
@@ -108,14 +108,11 @@ func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl
 			}
 		}
 
-		argNames = append(argNames, id)
-		args[id] = &Field{
+		paramNames = append(paramNames, id)
+		params[id] = &Field{
 			Name:    name,
 			Comment: doc,
 		}
-	}
-	{
-		// TODO: last
 	}
 
 	returnNames := []string{}
@@ -142,7 +139,7 @@ func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl
 			name = x.Names[0].Name
 			id = name
 		} else {
-			id = fmt.Sprintf("$ret%d", i)
+			id = fmt.Sprintf("ret#%d", i)
 		}
 
 		returnNames = append(returnNames, id)
@@ -169,8 +166,8 @@ func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl
 	f.Functions[name] = &Func{
 		Name:        name,
 		Doc:         decl.Doc.Text(),
-		Args:        args,
-		ArgNames:    argNames,
+		Params:      params,
+		ParamNames:  paramNames,
 		Returns:     returns,
 		ReturnNames: returnNames,
 	}

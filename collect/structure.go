@@ -23,8 +23,8 @@ type File struct {
 type Func struct {
 	Name string `json:"name"`
 
-	Args     map[string]*Field `json:"args"`
-	ArgNames []string          `json:"argnames"`
+	Params     map[string]*Field `json:"params"`
+	ParamNames []string          `json:"paramnames"`
 
 	Returns     map[string]*Field `json:"returns"`
 	ReturnNames []string          `json:"returnnames"`
