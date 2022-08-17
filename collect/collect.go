@@ -7,44 +7,6 @@ import (
 	"log"
 )
 
-type Package struct {
-	Files      map[string]*File   `json:"-"`
-	Structs    map[string]*Object `json:"structs"`
-	Interfaces map[string]*Object `json:"interfaces"`
-
-	FileNames []string `json:"filenames"`
-	Names     []string `json:"names"`
-}
-
-type File struct {
-	Structs    map[string]*Object `json:"structs"`
-	Interfaces map[string]*Object `json:"interfaces"`
-
-	Names []string `json:"names"`
-}
-
-type Object struct {
-	Name   string      `json:"name"`
-	Token  token.Token `json:"-"`
-	Parent *Object     `json:"-"`
-
-	Fields     map[string]*Field `json:"fields"`
-	FieldNames []string          `json:"fieldnames"`
-
-	Doc     string `json:"doc"`     // associated documentation; or nil (decl or spec?)
-	Comment string `json:"comment"` // line comments; or nil
-}
-
-type Field struct {
-	Name      string  `json:"name"`
-	Embedded  bool    `json:"embedded"`
-	Anonymous *Object `json:"annonymous,omitempty"`
-
-	Doc     string `json:"doc"`     // associated documentation; or nil
-	Comment string `json:"comment"` // line comments; or nil
-	// TODO: tag
-}
-
 type Collector struct {
 	Fset *token.FileSet
 	Dot  string
@@ -56,6 +18,7 @@ func (c *Collector) CollectFromPackage(p *Package, t *ast.Package) error {
 		f := &File{
 			Structs:    map[string]*Object{},
 			Interfaces: map[string]*Object{},
+			Functions:  map[string]*Func{},
 			Names:      []string{},
 		}
 		p.Files[filename] = f
@@ -70,6 +33,9 @@ func (c *Collector) CollectFromPackage(p *Package, t *ast.Package) error {
 		for name, s := range f.Interfaces {
 			p.Interfaces[name] = s
 		}
+		for name, s := range f.Functions {
+			p.Functions[name] = s
+		}
 	}
 	return nil
 }
@@ -77,7 +43,11 @@ func (c *Collector) CollectFromPackage(p *Package, t *ast.Package) error {
 func (c *Collector) CollectFromFile(f *File, t *ast.File) error {
 	for _, decl := range t.Decls {
 		switch decl := decl.(type) {
-		case *ast.FuncDecl, *ast.BadDecl:
+		case *ast.BadDecl:
+		case *ast.FuncDecl:
+			if err := c.CollectFromFuncDecl(f, decl); err != nil {
+				return err
+			}
 		case *ast.GenDecl:
 			if err := c.CollectFromGenDecl(f, decl); err != nil {
 				return err
@@ -87,11 +57,67 @@ func (c *Collector) CollectFromFile(f *File, t *ast.File) error {
 			continue
 		}
 	}
+
+	for _, cg := range t.Comments {
+		log.Println(cg.Text())
+	}
+	return nil
+}
+
+func (c *Collector) CollectFromFuncDecl(f *File, decl *ast.FuncDecl) error {
+	name := decl.Name.Name
+	f.Names = append(f.Names, name)
+
+	argNames := []string{}
+	args := map[string]*Field{}
+	for i, x := range decl.Type.Params.List {
+		name := ""
+		id := ""
+		if len(x.Names) > 0 {
+			name = x.Names[0].Name
+			id = name
+		} else {
+			id = fmt.Sprintf("arg%d", i)
+		}
+
+		argNames = append(argNames, id)
+		args[id] = &Field{
+			Name: name,
+			// TODO: doc
+		}
+	}
+
+	returnNames := []string{}
+	returns := map[string]*Field{}
+	for i, x := range decl.Type.Results.List {
+		name := ""
+		id := ""
+		if len(x.Names) > 0 {
+			name = x.Names[0].Name
+			id = name
+		} else {
+			id = fmt.Sprintf("ret%d", i)
+		}
+
+		returnNames = append(returnNames, id)
+		returns[id] = &Field{
+			Name: name,
+			// TODO: doc
+		}
+	}
+
+	f.Functions[name] = &Func{
+		Name:        name,
+		Doc:         decl.Doc.Text(),
+		Args:        args,
+		ArgNames:    argNames,
+		Returns:     returns,
+		ReturnNames: returnNames,
+	}
 	return nil
 }
 
 func (c *Collector) CollectFromGenDecl(f *File, decl *ast.GenDecl) error {
-	// decl.Tok == token.TYPE
 	for _, spec := range decl.Specs {
 		switch spec := spec.(type) {
 		case *ast.ImportSpec, *ast.ValueSpec:
