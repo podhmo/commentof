@@ -24,20 +24,14 @@ type File struct {
 }
 
 type Object struct {
-	Name   string   `json:"name"`
-	Parent *Object  `json:"-"`
-	Fields []*Field `json:"fields"`
+	Name   string      `json:"name"`
+	Token  token.Token `json:"-"`
+	Parent *Object     `json:"-"`
+	Fields []*Field    `json:"fields"`
 
 	Doc     string `json:"doc"`     // associated documentation; or nil (decl or spec?)
 	Comment string `json:"comment"` // line comments; or nil
 }
-
-// func (s *Object) MarshalJSON() ([]byte, error) {
-// 	type T Struct
-// 	inner := (T)(*s)
-// 	inner.Parent = nil
-// 	return json.Marshal(inner)
-// }
 
 type Field struct {
 	Name      string  `json:"name"`
@@ -57,7 +51,11 @@ type Collector struct {
 func (c *Collector) CollectFromPackage(p *Package, t *ast.Package) error {
 	for filename, ft := range t.Files {
 		p.FileNames = append(p.FileNames, filename)
-		f := &File{Structs: map[string]*Object{}, Names: []string{}}
+		f := &File{
+			Structs:    map[string]*Object{},
+			Interfaces: map[string]*Object{},
+			Names:      []string{},
+		}
 		p.Files[filename] = f
 		if err := c.CollectFromFile(f, ft); err != nil {
 			return fmt.Errorf("collect file: %s: %w", filename, err)
@@ -66,6 +64,9 @@ func (c *Collector) CollectFromPackage(p *Package, t *ast.Package) error {
 		p.Names = append(p.Names, f.Names...)
 		for name, s := range f.Structs {
 			p.Structs[name] = s
+		}
+		for name, s := range f.Interfaces {
+			p.Interfaces[name] = s
 		}
 	}
 	return nil
@@ -117,14 +118,20 @@ func (c *Collector) CollectFromTypeSpec(f *File, decl *ast.GenDecl, spec *ast.Ty
 		s.Doc = decl.Doc.Text()
 	}
 
-	f.Structs[name] = s
 	switch typ := spec.Type.(type) {
 	case *ast.Ident:
 		// type <S> <S>
 		// type <S> = <S>
 	case *ast.StructType:
 		// type <S> struct { ... }
+		f.Structs[name] = s
 		if err := c.CollectFromStructType(f, s, decl, spec, typ); err != nil {
+			return err
+		}
+	case *ast.InterfaceType:
+		// type <S> struct { ... }
+		f.Interfaces[name] = s
+		if err := c.CollectFromInterfaceType(f, s, decl, spec, typ); err != nil {
 			return err
 		}
 	default:
@@ -141,12 +148,15 @@ func typeString(typ ast.Expr) (string, bool) {
 	case *ast.SelectorExpr:
 		name, ok := typeString(t.X)
 		return name + "." + t.Sel.String(), ok
+	case *ast.InterfaceType, *ast.StructType:
+		return "", true
 	default:
 		return "", false
 	}
 }
 
 func (c *Collector) CollectFromStructType(f *File, s *Object, decl *ast.GenDecl, spec *ast.TypeSpec, typ *ast.StructType) error {
+	s.Token = token.STRUCT
 	for _, field := range typ.Fields.List {
 		name := ""
 		anonymous := false
@@ -170,7 +180,7 @@ func (c *Collector) CollectFromStructType(f *File, s *Object, decl *ast.GenDecl,
 		})
 
 		switch typ := field.Type.(type) {
-		case *ast.Ident:
+		case *ast.Ident, *ast.FuncType, *ast.SelectorExpr:
 		case *ast.StructType:
 			// type <S> struct { ... }
 			name := s.Name + c.Dot + name
@@ -186,9 +196,71 @@ func (c *Collector) CollectFromStructType(f *File, s *Object, decl *ast.GenDecl,
 			if err := c.CollectFromStructType(f, anonymous, decl, spec, typ); err != nil {
 				return err
 			}
+		case *ast.InterfaceType:
+			// type <S> struct { ... }
+			name := s.Name + c.Dot + name
+			f.Names = append(f.Names, name)
+			anonymous := &Object{
+				Name:    name,
+				Parent:  s,
+				Doc:     field.Doc.Text(),     // xxx
+				Comment: field.Comment.Text(), // xxx
+				Fields:  []*Field{},
+			}
+			s.Fields[len(s.Fields)-1].Anonymous = anonymous
+			if err := c.CollectFromInterfaceType(f, anonymous, decl, spec, typ); err != nil {
+				return err
+			}
 		default:
 			log.Printf("unexpected decl: %T, spec: %T, type: %T?, field=%s", decl, spec, typ, name)
+		}
+	}
+	return nil
+}
 
+func (c *Collector) CollectFromInterfaceType(f *File, s *Object, decl *ast.GenDecl, spec *ast.TypeSpec, typ *ast.InterfaceType) error {
+	s.Token = token.INTERFACE
+	for _, field := range typ.Methods.List {
+		name := ""
+		anonymous := false
+		if len(field.Names) > 0 {
+			name = field.Names[0].Name
+		} else {
+			anonymous = true
+			if typename, ok := typeString(field.Type); ok {
+				name = typename
+			} else {
+				name = fmt.Sprintf("??%T", field.Type) // TODO: NG:embedded
+				log.Printf("unexpected embedded field type: %T, spec: %T, struct: %T, field:%v", decl, spec, typ, field.Type)
+			}
+		}
+
+		s.Fields = append(s.Fields, &Field{
+			Name:     name,
+			Doc:      field.Doc.Text(),
+			Comment:  field.Comment.Text(),
+			Embedded: anonymous,
+		})
+
+		switch typ := field.Type.(type) {
+		case *ast.Ident, *ast.FuncType, *ast.SelectorExpr:
+		case *ast.InterfaceType:
+			// type <S> struct { ... }
+			name := s.Name + c.Dot + name
+			f.Names = append(f.Names, name)
+			anonymous := &Object{
+				Name:    name,
+				Parent:  s,
+				Doc:     field.Doc.Text(),     // xxx
+				Comment: field.Comment.Text(), // xxx
+				Fields:  []*Field{},
+			}
+			s.Fields[len(s.Fields)-1].Anonymous = anonymous
+			if err := c.CollectFromInterfaceType(f, anonymous, decl, spec, typ); err != nil {
+				return err
+			}
+		default:
+			log.Printf("unexpected decl: %T, spec: %T, type: %T?, field=%s", decl, spec, typ, name)
 		}
 	}
 	return nil
