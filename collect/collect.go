@@ -27,7 +27,9 @@ type Object struct {
 	Name   string      `json:"name"`
 	Token  token.Token `json:"-"`
 	Parent *Object     `json:"-"`
-	Fields []*Field    `json:"fields"`
+
+	Fields     map[string]*Field `json:"fields"`
+	FieldNames []string          `json:"fieldnames"`
 
 	Doc     string `json:"doc"`     // associated documentation; or nil (decl or spec?)
 	Comment string `json:"comment"` // line comments; or nil
@@ -109,10 +111,11 @@ func (c *Collector) CollectFromTypeSpec(f *File, decl *ast.GenDecl, spec *ast.Ty
 	name := spec.Name.Name
 	f.Names = append(f.Names, name)
 	s := &Object{
-		Name:    name,
-		Doc:     spec.Doc.Text(),
-		Comment: spec.Comment.Text(),
-		Fields:  []*Field{},
+		Name:       name,
+		Doc:        spec.Doc.Text(),
+		Comment:    spec.Comment.Text(),
+		FieldNames: []string{},
+		Fields:     map[string]*Field{},
 	}
 	if s.Doc == "" && decl.Doc != nil {
 		s.Doc = decl.Doc.Text()
@@ -172,12 +175,14 @@ func (c *Collector) CollectFromStructType(f *File, s *Object, decl *ast.GenDecl,
 			}
 		}
 
-		s.Fields = append(s.Fields, &Field{
+		s.FieldNames = append(s.FieldNames, name)
+		fieldof := &Field{
 			Name:     name,
 			Doc:      field.Doc.Text(),
 			Comment:  field.Comment.Text(),
 			Embedded: anonymous,
-		})
+		}
+		s.Fields[name] = fieldof
 
 		switch typ := field.Type.(type) {
 		case *ast.Ident, *ast.FuncType, *ast.SelectorExpr:
@@ -186,13 +191,14 @@ func (c *Collector) CollectFromStructType(f *File, s *Object, decl *ast.GenDecl,
 			name := s.Name + c.Dot + name
 			f.Names = append(f.Names, name)
 			anonymous := &Object{
-				Name:    name,
-				Parent:  s,
-				Doc:     field.Doc.Text(),     // xxx
-				Comment: field.Comment.Text(), // xxx
-				Fields:  []*Field{},
+				Name:       name,
+				Parent:     s,
+				Doc:        field.Doc.Text(),     // xxx
+				Comment:    field.Comment.Text(), // xxx
+				FieldNames: []string{},
+				Fields:     map[string]*Field{},
 			}
-			s.Fields[len(s.Fields)-1].Anonymous = anonymous
+			fieldof.Anonymous = anonymous
 			if err := c.CollectFromStructType(f, anonymous, decl, spec, typ); err != nil {
 				return err
 			}
@@ -201,13 +207,14 @@ func (c *Collector) CollectFromStructType(f *File, s *Object, decl *ast.GenDecl,
 			name := s.Name + c.Dot + name
 			f.Names = append(f.Names, name)
 			anonymous := &Object{
-				Name:    name,
-				Parent:  s,
-				Doc:     field.Doc.Text(),     // xxx
-				Comment: field.Comment.Text(), // xxx
-				Fields:  []*Field{},
+				Name:       name,
+				Parent:     s,
+				Doc:        field.Doc.Text(),     // xxx
+				Comment:    field.Comment.Text(), // xxx
+				FieldNames: []string{},
+				Fields:     map[string]*Field{},
 			}
-			s.Fields[len(s.Fields)-1].Anonymous = anonymous
+			fieldof.Anonymous = anonymous
 			if err := c.CollectFromInterfaceType(f, anonymous, decl, spec, typ); err != nil {
 				return err
 			}
@@ -235,12 +242,14 @@ func (c *Collector) CollectFromInterfaceType(f *File, s *Object, decl *ast.GenDe
 			}
 		}
 
-		s.Fields = append(s.Fields, &Field{
+		s.FieldNames = append(s.FieldNames, name)
+		fieldof := &Field{
 			Name:     name,
 			Doc:      field.Doc.Text(),
 			Comment:  field.Comment.Text(),
 			Embedded: anonymous,
-		})
+		}
+		s.Fields[name] = fieldof
 
 		switch typ := field.Type.(type) {
 		case *ast.Ident, *ast.FuncType, *ast.SelectorExpr:
@@ -249,13 +258,14 @@ func (c *Collector) CollectFromInterfaceType(f *File, s *Object, decl *ast.GenDe
 			name := s.Name + c.Dot + name
 			f.Names = append(f.Names, name)
 			anonymous := &Object{
-				Name:    name,
-				Parent:  s,
-				Doc:     field.Doc.Text(),     // xxx
-				Comment: field.Comment.Text(), // xxx
-				Fields:  []*Field{},
+				Name:       name,
+				Parent:     s,
+				Doc:        field.Doc.Text(),     // xxx
+				Comment:    field.Comment.Text(), // xxx
+				FieldNames: []string{},
+				Fields:     map[string]*Field{},
 			}
-			s.Fields[len(s.Fields)-1].Anonymous = anonymous
+			fieldof.Anonymous = anonymous
 			if err := c.CollectFromInterfaceType(f, anonymous, decl, spec, typ); err != nil {
 				return err
 			}
