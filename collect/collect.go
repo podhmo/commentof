@@ -8,28 +8,31 @@ import (
 )
 
 type Package struct {
-	Files   map[string]*File   `json:"-"`
-	Structs map[string]*Struct `json:"structs"`
+	Files      map[string]*File   `json:"-"`
+	Structs    map[string]*Object `json:"structs"`
+	Interfaces map[string]*Object `json:"interfaces"`
 
 	FileNames []string `json:"filenames"`
 	Names     []string `json:"names"`
 }
 
 type File struct {
-	Structs map[string]*Struct `json:"structs"`
-	Names   []string           `json:"names"`
+	Structs    map[string]*Object `json:"structs"`
+	Interfaces map[string]*Object `json:"interfaces"`
+
+	Names []string `json:"names"`
 }
 
-type Struct struct {
+type Object struct {
 	Name   string   `json:"name"`
-	Parent *Struct  `json:"-"`
+	Parent *Object  `json:"-"`
 	Fields []*Field `json:"fields"`
 
 	Doc     string `json:"doc"`     // associated documentation; or nil (decl or spec?)
 	Comment string `json:"comment"` // line comments; or nil
 }
 
-// func (s *Struct) MarshalJSON() ([]byte, error) {
+// func (s *Object) MarshalJSON() ([]byte, error) {
 // 	type T Struct
 // 	inner := (T)(*s)
 // 	inner.Parent = nil
@@ -39,7 +42,7 @@ type Struct struct {
 type Field struct {
 	Name      string  `json:"name"`
 	Embedded  bool    `json:"embedded"`
-	Anonymous *Struct `json:"annonymous,omitempty"`
+	Anonymous *Object `json:"annonymous,omitempty"`
 
 	Doc     string `json:"doc"`     // associated documentation; or nil
 	Comment string `json:"comment"` // line comments; or nil
@@ -54,7 +57,7 @@ type Collector struct {
 func (c *Collector) CollectFromPackage(p *Package, t *ast.Package) error {
 	for filename, ft := range t.Files {
 		p.FileNames = append(p.FileNames, filename)
-		f := &File{Structs: map[string]*Struct{}, Names: []string{}}
+		f := &File{Structs: map[string]*Object{}, Names: []string{}}
 		p.Files[filename] = f
 		if err := c.CollectFromFile(f, ft); err != nil {
 			return fmt.Errorf("collect file: %s: %w", filename, err)
@@ -104,7 +107,7 @@ func (c *Collector) CollectFromGenDecl(f *File, decl *ast.GenDecl) error {
 func (c *Collector) CollectFromTypeSpec(f *File, decl *ast.GenDecl, spec *ast.TypeSpec) error {
 	name := spec.Name.Name
 	f.Names = append(f.Names, name)
-	s := &Struct{
+	s := &Object{
 		Name:    name,
 		Doc:     spec.Doc.Text(),
 		Comment: spec.Comment.Text(),
@@ -143,7 +146,7 @@ func typeString(typ ast.Expr) (string, bool) {
 	}
 }
 
-func (c *Collector) CollectFromStructType(f *File, s *Struct, decl *ast.GenDecl, spec *ast.TypeSpec, typ *ast.StructType) error {
+func (c *Collector) CollectFromStructType(f *File, s *Object, decl *ast.GenDecl, spec *ast.TypeSpec, typ *ast.StructType) error {
 	for _, field := range typ.Fields.List {
 		name := ""
 		anonymous := false
@@ -172,7 +175,7 @@ func (c *Collector) CollectFromStructType(f *File, s *Struct, decl *ast.GenDecl,
 			// type <S> struct { ... }
 			name := s.Name + c.Dot + name
 			f.Names = append(f.Names, name)
-			anonymous := &Struct{
+			anonymous := &Object{
 				Name:    name,
 				Parent:  s,
 				Doc:     field.Doc.Text(),     // xxx
