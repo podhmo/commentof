@@ -1,12 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"go/parser"
 	"go/token"
 	"log"
+	"os"
 
-	"github.com/k0kubun/pp"
 	"github.com/podhmo/commentof"
 )
 
@@ -32,6 +33,10 @@ func run() error {
 		return fmt.Errorf("collect: file=%s, %w", filename, err)
 	}
 
-	pp.Println(f)
+	enc := json.NewEncoder(os.Stdout)
+	enc.SetIndent("", "	")
+	fmt.Println(enc.Encode(f))
+
+	// pp.Println(f)
 	return nil
 }

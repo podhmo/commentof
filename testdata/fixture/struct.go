@@ -20,7 +20,7 @@ type S struct {
 	Nested struct { // in struct comment 2  :IGNORED:
 
 		// ExportedString is exported string @FF0
-		ExportedString string // ExportedString is exported string @@FF1
+		ExportedString string // ExportedString is exported string @FF1
 
 		// in struct comment 3  :IGNORED:
 	} // Nested is struct @SS1

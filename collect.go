@@ -5,16 +5,15 @@ import (
 	"go/ast"
 	"go/token"
 	"log"
-	"strings"
 )
 
 func FileAST(fset *token.FileSet, t *ast.File) (*File, error) {
-	for _, cg := range t.Comments {
-		log.Println(strings.TrimSpace(cg.Text()))
-	}
-	log.Println("----------------------------------------")
+	// for _, cg := range t.Comments {
+	// 	log.Println(strings.TrimSpace(cg.Text()))
+	// }
+	// log.Println("----------------------------------------")
 	c := &collector{fset: fset, dot: "."}
-	f := &File{structMap: map[string]*Struct{}}
+	f := &File{Structs: map[string]*Struct{}}
 	return f, c.CollectFromFile(f, t)
 }
 
@@ -61,14 +60,15 @@ func (c *collector) CollectFromTypeSpec(f *File, decl *ast.GenDecl, spec *ast.Ty
 	f.Names = append(f.Names, name)
 	s := &Struct{
 		Name:    name,
-		Doc:     spec.Doc,
-		Comment: spec.Comment,
+		Doc:     spec.Doc.Text(),
+		Comment: spec.Comment.Text(),
+		Fields:  []*Field{},
 	}
-	if s.Doc == nil && decl.Doc != nil {
-		s.Doc = decl.Doc
+	if s.Doc == "" && decl.Doc != nil {
+		s.Doc = decl.Doc.Text()
 	}
 
-	f.structMap[name] = s
+	f.Structs[name] = s
 	switch typ := spec.Type.(type) {
 	case *ast.Ident:
 		// type <S> <S>
@@ -98,8 +98,8 @@ func (c *collector) CollectFromStructType(f *File, s *Struct, decl *ast.GenDecl,
 
 		s.Fields = append(s.Fields, &Field{
 			Name:     name,
-			Doc:      field.Doc,
-			Comment:  field.Comment,
+			Doc:      field.Doc.Text(),
+			Comment:  field.Comment.Text(),
 			Embedded: anonymous,
 		})
 
@@ -111,8 +111,10 @@ func (c *collector) CollectFromStructType(f *File, s *Struct, decl *ast.GenDecl,
 			f.Names = append(f.Names, name)
 			anonymous := &Struct{
 				Name:    name,
-				Doc:     field.Doc,     // xxx
-				Comment: field.Comment, // xxx
+				Parent:  s,
+				Doc:     field.Doc.Text(),     // xxx
+				Comment: field.Comment.Text(), // xxx
+				Fields:  []*Field{},
 			}
 			s.Fields[len(s.Fields)-1].Anonymous = anonymous
 			if err := c.CollectFromStructType(f, anonymous, decl, spec, typ); err != nil {
@@ -127,24 +129,32 @@ func (c *collector) CollectFromStructType(f *File, s *Struct, decl *ast.GenDecl,
 }
 
 type File struct {
-	structMap map[string]*Struct
-	Names     []string
+	Structs map[string]*Struct `json:"structs"`
+	Names   []string           `json:"names"`
 }
 
 type Struct struct {
-	Name   string
-	Fields []*Field
+	Name   string   `json:"name"`
+	Parent *Struct  `json:"-"`
+	Fields []*Field `json:"fields"`
 
-	Doc     *ast.CommentGroup // decl and spec?
-	Comment *ast.CommentGroup
+	Doc     string `json:"doc"`     // associated documentation; or nil (decl or spec?)
+	Comment string `json:"comment"` // line comments; or nil
 }
 
-type Field struct {
-	Name      string
-	Embedded  bool
-	Anonymous *Struct
+// func (s *Struct) MarshalJSON() ([]byte, error) {
+// 	type T Struct
+// 	inner := (T)(*s)
+// 	inner.Parent = nil
+// 	return json.Marshal(inner)
+// }
 
-	Doc     *ast.CommentGroup // associated documentation; or nil
-	Comment *ast.CommentGroup // line comments; or nil
+type Field struct {
+	Name      string  `json:"name"`
+	Embedded  bool    `json:"embedded"`
+	Anonymous *Struct `json:"annonymous,omitempty"`
+
+	Doc     string `json:"doc"`     // associated documentation; or nil
+	Comment string `json:"comment"` // line comments; or nil
 	// TODO: tag
 }
