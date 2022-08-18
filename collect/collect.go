@@ -54,7 +54,10 @@ func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl
 	}
 
 	name := decl.Name.Name
-	id := recv + c.Sharp + name
+	id := name
+	if recv != "" {
+		id = recv + c.Sharp + name
+	}
 
 	f.Names = append(f.Names, id)
 
