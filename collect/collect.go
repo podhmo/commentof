@@ -215,7 +215,7 @@ func (c *Collector) CollectFromTypeSpec(f *File, decl *ast.GenDecl, spec *ast.Ty
 			return err
 		}
 	case *ast.InterfaceType:
-		// type <S> struct { ... }
+		// type <S> interface { ... }
 		f.Interfaces[name] = s
 		if err := c.CollectFromInterfaceType(f, s, decl, spec, typ); err != nil {
 			return err
@@ -253,7 +253,7 @@ func (c *Collector) CollectFromStructType(f *File, s *Object, decl *ast.GenDecl,
 			if typename, ok := typeString(field.Type); ok {
 				name = typename
 			} else {
-				name = fmt.Sprintf("??%T", field.Type) // TODO: NG:embedded
+				name = fmt.Sprintf("??%T", field.Type) // TODO: NG
 				log.Printf("unexpected embedded field type: %T, spec: %T, struct: %T, field:%v", decl, spec, typ, field.Type)
 			}
 		}
@@ -274,14 +274,14 @@ func (c *Collector) CollectFromStructType(f *File, s *Object, decl *ast.GenDecl,
 		switch typ := field.Type.(type) {
 		case *ast.Ident, *ast.FuncType, *ast.SelectorExpr:
 		case *ast.StructType:
-			// type <S> struct { ... }
+			// struct { ... }
 			name := s.Name + c.Dot + name
 			f.Names = append(f.Names, name)
 			anonymous := &Object{
 				Name:       name,
 				Parent:     s,
-				Doc:        field.Doc.Text(),     // xxx
-				Comment:    field.Comment.Text(), // xxx
+				Doc:        field.Doc.Text(),
+				Comment:    field.Comment.Text(),
 				FieldNames: []string{},
 				Fields:     map[string]*Field{},
 			}
@@ -290,14 +290,14 @@ func (c *Collector) CollectFromStructType(f *File, s *Object, decl *ast.GenDecl,
 				return err
 			}
 		case *ast.InterfaceType:
-			// type <S> struct { ... }
+			// interface { ... }
 			name := s.Name + c.Dot + name
 			f.Names = append(f.Names, name)
 			anonymous := &Object{
 				Name:       name,
 				Parent:     s,
-				Doc:        field.Doc.Text(),     // xxx
-				Comment:    field.Comment.Text(), // xxx
+				Doc:        field.Doc.Text(),
+				Comment:    field.Comment.Text(),
 				FieldNames: []string{},
 				Fields:     map[string]*Field{},
 			}
@@ -324,7 +324,7 @@ func (c *Collector) CollectFromInterfaceType(f *File, s *Object, decl *ast.GenDe
 			if typename, ok := typeString(field.Type); ok {
 				name = typename
 			} else {
-				name = fmt.Sprintf("??%T", field.Type) // TODO: NG:embedded
+				name = fmt.Sprintf("??%T", field.Type) // TODO: NG
 				log.Printf("unexpected embedded field type: %T, spec: %T, struct: %T, field:%v", decl, spec, typ, field.Type)
 			}
 		}
@@ -345,14 +345,14 @@ func (c *Collector) CollectFromInterfaceType(f *File, s *Object, decl *ast.GenDe
 		switch typ := field.Type.(type) {
 		case *ast.Ident, *ast.FuncType, *ast.SelectorExpr:
 		case *ast.InterfaceType:
-			// type <S> struct { ... }
+			// interface { ... }
 			name := s.Name + c.Dot + name
 			f.Names = append(f.Names, name)
 			anonymous := &Object{
 				Name:       name,
 				Parent:     s,
-				Doc:        field.Doc.Text(),     // xxx
-				Comment:    field.Comment.Text(), // xxx
+				Doc:        field.Doc.Text(),
+				Comment:    field.Comment.Text(),
 				FieldNames: []string{},
 				Fields:     map[string]*Field{},
 			}
