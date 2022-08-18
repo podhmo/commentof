@@ -8,8 +8,9 @@ import (
 )
 
 type Collector struct {
-	Fset *token.FileSet
-	Dot  string
+	Fset  *token.FileSet
+	Dot   string
+	Sharp string
 }
 
 func (c *Collector) CollectFromPackage(p *Package, t *ast.Package) error {
@@ -27,14 +28,14 @@ func (c *Collector) CollectFromPackage(p *Package, t *ast.Package) error {
 		}
 
 		p.Names = append(p.Names, f.Names...)
-		for name, s := range f.Structs {
-			p.Structs[name] = s
+		for id, s := range f.Structs {
+			p.Structs[id] = s
 		}
-		for name, s := range f.Interfaces {
-			p.Interfaces[name] = s
+		for id, s := range f.Interfaces {
+			p.Interfaces[id] = s
 		}
-		for name, s := range f.Functions {
-			p.Functions[name] = s
+		for id, s := range f.Functions {
+			p.Functions[id] = s
 		}
 	}
 	return nil
@@ -61,8 +62,17 @@ func (c *Collector) CollectFromFile(f *File, t *ast.File) error {
 }
 
 func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl) error {
+	recv := ""
+	if decl.Recv != nil && decl.Recv.List != nil {
+		if v, ok := typeString(decl.Recv.List[0].Type); ok {
+			recv = v
+		}
+	}
+
 	name := decl.Name.Name
-	f.Names = append(f.Names, name)
+	id := recv + c.Sharp + name
+
+	f.Names = append(f.Names, id)
 
 	paramNames := []string{}
 	params := map[string]*Field{}
@@ -163,8 +173,9 @@ func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl
 		}
 	}
 
-	f.Functions[name] = &Func{
+	f.Functions[id] = &Func{
 		Name:        name,
+		Recv:        recv,
 		Doc:         decl.Doc.Text(),
 		Params:      params,
 		ParamNames:  paramNames,
@@ -236,6 +247,9 @@ func typeString(typ ast.Expr) (string, bool) {
 		return name + "." + t.Sel.String(), ok
 	case *ast.InterfaceType, *ast.StructType:
 		return "", true
+	case *ast.StarExpr:
+		name, ok := typeString(t.X)
+		return "*" + name, ok
 	default:
 		return "", false
 	}

@@ -8,7 +8,7 @@ import (
 )
 
 func File(fset *token.FileSet, t *ast.File) (*collect.File, error) {
-	c := &collect.Collector{Fset: fset, Dot: "."}
+	c := &collect.Collector{Fset: fset, Dot: ".", Sharp: "#"}
 	f := &collect.File{
 		Structs:    map[string]*collect.Object{},
 		Interfaces: map[string]*collect.Object{},
@@ -19,7 +19,7 @@ func File(fset *token.FileSet, t *ast.File) (*collect.File, error) {
 }
 
 func Package(fset *token.FileSet, t *ast.Package) (*collect.Package, error) {
-	c := &collect.Collector{Fset: fset, Dot: "."}
+	c := &collect.Collector{Fset: fset, Dot: ".", Sharp: "#"}
 	p := &collect.Package{
 		Files: map[string]*collect.File{}, FileNames: []string{},
 		Structs:    map[string]*collect.Object{},
