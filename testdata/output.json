@@ -447,7 +447,7 @@
 					"name": "",
 					"embedded": false,
 					"doc": "",
-					"comment": " result if F4 @ret4 :IGNORED\n ret of F4 @ret5 :IGNORED\n"
+					"comment": " result if F4 @ret4 :IGNORED\n ret of F4 @ret5 :IGNORED\n err of F4 @ret6 :IGNORED\n"
 				},
 				"ret#1": {
 					"name": "",
@@ -461,6 +461,14 @@
 				"ret#1"
 			],
 			"doc": "F4 is function @FUN4\n"
+		},
+		"F5": {
+			"name": "F5",
+			"params": {},
+			"paramnames": [],
+			"returns": {},
+			"returnnames": [],
+			"doc": "F5 is function @FUN5\n"
 		}
 	},
 	"filenames": [
@@ -478,6 +486,7 @@
 		"F2",
 		"F3",
 		"F4",
+		"F5",
 		"I",
 		"I2",
 		"I3",
