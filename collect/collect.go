@@ -5,6 +5,7 @@ import (
 	"go/ast"
 	"go/token"
 	"log"
+	"sort"
 )
 
 type Collector struct {
@@ -15,7 +16,15 @@ type Collector struct {
 
 func (c *Collector) CollectFromPackage(p *Package, t *ast.Package) error {
 	b := &PackageBuilder{Package: p}
-	for filename, ft := range t.Files {
+
+	filenames := make([]string, 0, len(t.Files))
+	for filename := range t.Files {
+		filenames = append(filenames, filename)
+	}
+	sort.Strings(filenames)
+
+	for _, filename := range filenames {
+		ft := t.Files[filename]
 		f := NewFile()
 		if err := c.CollectFromFile(f, ft); err != nil {
 			return fmt.Errorf("collect file: %s: %w", filename, err)

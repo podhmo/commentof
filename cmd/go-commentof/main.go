@@ -7,6 +7,7 @@ import (
 	"go/token"
 	"log"
 	"os"
+	"sort"
 
 	"github.com/podhmo/commentof"
 )
@@ -17,7 +18,7 @@ func main() {
 		if filename == "-" {
 			continue
 		}
-		
+
 		stat, err := os.Stat(filename)
 		if err != nil {
 			log.Printf("skip %+v", err)
@@ -42,7 +43,14 @@ func runDir(fset *token.FileSet, dirname string) error {
 		return fmt.Errorf("parse dir: %w", err)
 	}
 
-	for name, p := range tree {
+	names := make([]string, 0, len(tree))
+	for name := range tree {
+		names = append(names, name)
+	}
+	sort.Strings(names)
+
+	for _, name := range names {
+		p := tree[name]
 		result, err := commentof.Package(fset, p)
 		if err != nil {
 			return fmt.Errorf("collect: dir=%s, name=%s, %w", dirname, name, err)
