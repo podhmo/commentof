@@ -7,6 +7,8 @@ import (
 	"go/token"
 	"log"
 	"os"
+	"path/filepath"
+	"runtime"
 	"sort"
 
 	"github.com/podhmo/commentof"
@@ -21,8 +23,13 @@ func main() {
 
 		stat, err := os.Stat(filename)
 		if err != nil {
-			log.Printf("skip %+v", err)
-			continue
+			stdSrcFilename := filepath.Join(runtime.GOROOT(), "src", filename)
+			stat, err = os.Stat(stdSrcFilename)
+			if err != nil {
+				log.Printf("skip %+v", err)
+				continue
+			}
+			filename = stdSrcFilename
 		}
 
 		if stat.IsDir() {
