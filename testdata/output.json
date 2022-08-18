@@ -16,6 +16,71 @@
 			"doc": "Base is struct @S10\n",
 			"comment": ""
 		},
+		"Ob": {
+			"name": "Ob",
+			"fields": {
+				"name": {
+					"name": "name",
+					"embedded": false,
+					"doc": "",
+					"comment": ""
+				}
+			},
+			"fieldnames": [
+				"name"
+			],
+			"methods": {
+				"MarshalJSON": {
+					"name": "MarshalJSON",
+					"recv": "*Ob",
+					"params": {},
+					"paramnames": [],
+					"returns": {
+						"ret#0": {
+							"name": "",
+							"embedded": false,
+							"doc": "",
+							"comment": ""
+						},
+						"ret#1": {
+							"name": "",
+							"embedded": false,
+							"doc": "",
+							"comment": ""
+						}
+					},
+					"returnnames": [
+						"ret#0",
+						"ret#1"
+					],
+					"doc": ""
+				},
+				"Name": {
+					"name": "Name",
+					"recv": "Ob",
+					"params": {},
+					"paramnames": [],
+					"returns": {
+						"ret#0": {
+							"name": "",
+							"embedded": false,
+							"doc": "",
+							"comment": ""
+						}
+					},
+					"returnnames": [
+						"ret#0"
+					],
+					"doc": ""
+				}
+			},
+			"methodnames": [
+				"Name",
+				"MarshalJSON"
+			],
+			"doc": "",
+			"comment": ""
+		},
 		"S": {
 			"name": "S",
 			"fields": {
@@ -399,17 +464,14 @@
 		}
 	},
 	"filenames": [
-		"testdata/fixture/struct.go",
 		"testdata/fixture/const.go",
 		"testdata/fixture/embedded.go",
 		"testdata/fixture/func.go",
-		"testdata/fixture/interface.go"
+		"testdata/fixture/interface.go",
+		"testdata/fixture/method.go",
+		"testdata/fixture/struct.go"
 	],
 	"names": [
-		"S",
-		"S.Nested",
-		"S2",
-		"S3",
 		"Base",
 		"S10",
 		"F",
@@ -419,6 +481,11 @@
 		"I",
 		"I2",
 		"I3",
-		"I3."
+		"I3.",
+		"Ob",
+		"S",
+		"S.Nested",
+		"S2",
+		"S3"
 	]
 }
