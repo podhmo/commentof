@@ -14,29 +14,13 @@ type Collector struct {
 }
 
 func (c *Collector) CollectFromPackage(p *Package, t *ast.Package) error {
+	b := &PackageBuilder{Package: p}
 	for filename, ft := range t.Files {
-		p.FileNames = append(p.FileNames, filename)
-		f := &File{
-			Structs:    map[string]*Object{},
-			Interfaces: map[string]*Object{},
-			Functions:  map[string]*Func{},
-			Names:      []string{},
-		}
-		p.Files[filename] = f
+		f := NewFile()
 		if err := c.CollectFromFile(f, ft); err != nil {
 			return fmt.Errorf("collect file: %s: %w", filename, err)
 		}
-
-		p.Names = append(p.Names, f.Names...)
-		for id, s := range f.Structs {
-			p.Structs[id] = s
-		}
-		for id, s := range f.Interfaces {
-			p.Interfaces[id] = s
-		}
-		for id, s := range f.Functions {
-			p.Functions[id] = s
-		}
+		b.AddFile(f, filename)
 	}
 	return nil
 }
@@ -210,6 +194,7 @@ func (c *Collector) CollectFromTypeSpec(f *File, decl *ast.GenDecl, spec *ast.Ty
 		Comment:    spec.Comment.Text(),
 		FieldNames: []string{},
 		Fields:     map[string]*Field{},
+		Methods:    map[string]*Func{},
 	}
 	if s.Doc == "" && decl.Doc != nil {
 		s.Doc = decl.Doc.Text()
