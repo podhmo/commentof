@@ -124,51 +124,52 @@ func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl
 	returnNames := []string{}
 	returns := map[string]*Field{}
 	comments = nil
-	{
-		start := decl.Type.Results.Opening
-		end := decl.Type.Results.Closing
-		for _, cg := range t.Comments[idx:] {
-			if cg.End() < start {
-				continue
+	if decl.Type.Results != nil {
+		{
+			start := decl.Type.Results.Opening
+			end := decl.Type.Results.Closing
+			for _, cg := range t.Comments[idx:] {
+				if cg.End() < start {
+					continue
+				}
+				if end < cg.Pos() {
+					break
+				}
+				comments = append(comments, cg)
 			}
-			if end < cg.Pos() {
-				break
+		}
+
+		for i, x := range decl.Type.Results.List {
+			name := ""
+			id := ""
+			if len(x.Names) > 0 {
+				name = x.Names[0].Name
+				id = name
+			} else {
+				id = fmt.Sprintf("ret#%d", i)
 			}
-			comments = append(comments, cg)
+
+			returnNames = append(returnNames, id)
+			doc := ""
+			for _, cg := range comments {
+				// fmt.Println(f.Names[len(f.Names)-1], id, "@@", x.Pos(), x.End(), "@", cg.Pos(), cg.End(), "--", strings.TrimSpace(cg.Text()))
+				if x.Pos() < cg.Pos() && cg.End() < x.End() {
+					doc += cg.Text()
+					// fmt.Println(f.Names[len(f.Names)-1], id, "-#", x.Pos(), x.End(), "@", cg.Pos(), cg.End(), "--", strings.TrimSpace(cg.Text()))
+					continue
+				}
+				if x.End() < cg.Pos() {
+					// fmt.Println(f.Names[len(f.Names)-1], id, "--", x.Pos(), x.End(), "@", cg.Pos(), cg.End(), "--", strings.TrimSpace(cg.Text()))
+					doc += cg.Text()
+					break
+				}
+			}
+			returns[id] = &Field{
+				Name:    name,
+				Comment: doc,
+			}
 		}
 	}
-
-	for i, x := range decl.Type.Results.List {
-		name := ""
-		id := ""
-		if len(x.Names) > 0 {
-			name = x.Names[0].Name
-			id = name
-		} else {
-			id = fmt.Sprintf("ret#%d", i)
-		}
-
-		returnNames = append(returnNames, id)
-		doc := ""
-		for _, cg := range comments {
-			// fmt.Println(f.Names[len(f.Names)-1], id, "@@", x.Pos(), x.End(), "@", cg.Pos(), cg.End(), "--", strings.TrimSpace(cg.Text()))
-			if x.Pos() < cg.Pos() && cg.End() < x.End() {
-				doc += cg.Text()
-				// fmt.Println(f.Names[len(f.Names)-1], id, "-#", x.Pos(), x.End(), "@", cg.Pos(), cg.End(), "--", strings.TrimSpace(cg.Text()))
-				continue
-			}
-			if x.End() < cg.Pos() {
-				// fmt.Println(f.Names[len(f.Names)-1], id, "--", x.Pos(), x.End(), "@", cg.Pos(), cg.End(), "--", strings.TrimSpace(cg.Text()))
-				doc += cg.Text()
-				break
-			}
-		}
-		returns[id] = &Field{
-			Name:    name,
-			Comment: doc,
-		}
-	}
-
 	f.Functions[id] = &Func{
 		Name:        name,
 		Recv:        recv,

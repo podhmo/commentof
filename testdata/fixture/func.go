@@ -29,6 +29,11 @@ func F3(
 }
 
 // F4 is function @FUN4
-func F4(x int /* x of F4 @arg4 :IGNORED:*/ /* x of F4 @arg5 :IGNORED:*/, y /* y of F4 @arg6 :IGNORED:*/ string /* y of F4 @arg7 :IGNORED:*/, args ...interface{} /* arg of F4 @arg8 :IGNORED:*/) ( /* result if F4 @ret3 :IGNORED */ string /* result if F4 @ret4 :IGNORED */ /* ret of F4 @ret5 :IGNORED */, /* err of F4 @ret6 :IGNORED */ error /* err of F4 @ret7 :IGNORED */) {
+func F4(x int /* x of F4 @arg4 :IGNORED:*/ /* x of F4 @arg5 :IGNORED:*/, y /* y of F4 @arg6 :IGNORED:*/ string /* y of F4 @arg7 :IGNORED:*/, args ...interface{} /* arg of F4 @arg8 :IGNORED:*/) ( /* result if F4 @ret3 :IGNORED */ string /* result if F4 @ret4 :IGNORED */ /* ret of F4 @ret5 :IGNORED */ /* err of F4 @ret6 :IGNORED */, error /* err of F4 @ret7 :IGNORED */) {
 	return "", nil
+}
+
+// F5 is function @FUN5
+func F5() {
+
 }
