@@ -22,11 +22,13 @@ import (
 )
 
 var options struct {
-	IncludeTestFile bool
+	IncludeTestFile   bool
+	IncludeUnexported bool
 }
 
 func main() {
-	flag.BoolVar(&options.IncludeTestFile, "include-test-file", false, "inglude *_test.go")
+	flag.BoolVar(&options.IncludeTestFile, "include-test-file", false, "include *_test.go")
+	flag.BoolVar(&options.IncludeUnexported, "include-unexported", false, "include unexported symbols")
 	flag.Parse()
 
 	fset := token.NewFileSet()
@@ -80,7 +82,7 @@ func runDir(fset *token.FileSet, dirname string) error {
 
 	for _, name := range names {
 		p := tree[name]
-		result, err := commentof.Package(fset, p)
+		result, err := commentof.Package(fset, p, commentof.WithIncludeUnexported(options.IncludeUnexported))
 		if err != nil {
 			return fmt.Errorf("collect: dir=%s, name=%s, %w", dirname, name, err)
 		}
@@ -100,7 +102,7 @@ func runFile(fset *token.FileSet, filename string) error {
 		return fmt.Errorf("parse file: %w", err)
 	}
 
-	result, err := commentof.File(fset, tree)
+	result, err := commentof.File(fset, tree, commentof.WithIncludeUnexported(options.IncludeUnexported))
 	if err != nil {
 		return fmt.Errorf("collect: file=%s, %w", filename, err)
 	}
