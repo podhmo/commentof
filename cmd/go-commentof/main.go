@@ -24,12 +24,20 @@ import (
 var options struct {
 	IncludeTestFile   bool
 	IncludeUnexported bool
+
+	All bool
 }
 
 func main() {
 	flag.BoolVar(&options.IncludeTestFile, "include-test-file", false, "include *_test.go")
 	flag.BoolVar(&options.IncludeUnexported, "include-unexported", false, "include unexported symbols")
+	flag.BoolVar(&options.All, "all", false, "enable all options")
 	flag.Parse()
+
+	if options.All {
+		options.IncludeTestFile = true
+		options.IncludeUnexported = true
+	}
 
 	fset := token.NewFileSet()
 	for _, filename := range os.Args[1:] {
