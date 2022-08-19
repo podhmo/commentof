@@ -317,6 +317,10 @@ func (c *Collector) CollectFromStructType(f *File, s *Object, decl *ast.GenDecl,
 			if err := c.CollectFromInterfaceType(f, anonymous, decl, spec, typ); err != nil {
 				return err
 			}
+		case *ast.BadExpr, *ast.Ellipsis, *ast.BasicLit, *ast.FuncLit, *ast.CompositeLit,
+			*ast.ParenExpr, *ast.IndexExpr, *ast.IndexListExpr, *ast.SliceExpr, *ast.TypeAssertExpr, *ast.CallExpr,
+			*ast.StarExpr, *ast.UnaryExpr, *ast.BinaryExpr, *ast.KeyValueExpr,
+			*ast.ArrayType, *ast.MapType, *ast.ChanType:
 		default:
 			log.Printf("unexpected decl: %T, spec: %T, type: %T?, field=%s", decl, spec, typ, name)
 		}
@@ -372,6 +376,10 @@ func (c *Collector) CollectFromInterfaceType(f *File, s *Object, decl *ast.GenDe
 			if err := c.CollectFromInterfaceType(f, anonymous, decl, spec, typ); err != nil {
 				return err
 			}
+		case *ast.BadExpr, *ast.Ellipsis, *ast.BasicLit, *ast.FuncLit, *ast.CompositeLit,
+			*ast.ParenExpr, *ast.IndexExpr, *ast.IndexListExpr, *ast.SliceExpr, *ast.TypeAssertExpr, *ast.CallExpr,
+			*ast.StarExpr, *ast.UnaryExpr, *ast.BinaryExpr, *ast.KeyValueExpr,
+			*ast.ArrayType, *ast.MapType, *ast.ChanType:
 		default:
 			log.Printf("unexpected decl: %T, spec: %T, type: %T?, field=%s", decl, spec, typ, name)
 		}
