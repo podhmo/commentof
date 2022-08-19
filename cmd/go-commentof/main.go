@@ -4,21 +4,31 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"flag"
 	"fmt"
 	"go/parser"
 	"go/token"
 	"io"
+	"io/fs"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"sort"
+	"strings"
 
 	"github.com/podhmo/commentof"
 )
 
+var options struct {
+	IncludeTestFile bool
+}
+
 func main() {
+	flag.BoolVar(&options.IncludeTestFile, "include-test-file", false, "inglude *_test.go")
+	flag.Parse()
+
 	fset := token.NewFileSet()
 	for _, filename := range os.Args[1:] {
 		if filename == "-" {
@@ -51,7 +61,13 @@ func main() {
 }
 
 func runDir(fset *token.FileSet, dirname string) error {
-	tree, err := parser.ParseDir(fset, dirname, nil, parser.ParseComments)
+	filter := func(info fs.FileInfo) bool {
+		return !strings.HasSuffix(info.Name(), "_test.go")
+	}
+	if options.IncludeTestFile {
+		filter = nil
+	}
+	tree, err := parser.ParseDir(fset, dirname, filter, parser.ParseComments)
 	if err != nil {
 		return fmt.Errorf("parse dir: %w", err)
 	}
