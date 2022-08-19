@@ -140,9 +140,11 @@ func runModulePackage(fset *token.FileSet, pkgpath string) error {
 	if err != nil {
 		return err
 	}
+
 	for _, mod := range mods {
-		if mod.Path == pkgpath {
-			return runDir(fset, mod.Dir)
+		if strings.HasPrefix(pkgpath, mod.Path) {
+			dirname := strings.Replace(pkgpath, mod.Path, mod.Dir, 1)
+			return runDir(fset, dirname)
 		}
 	}
 	return fmt.Errorf("package %s is not found", pkgpath)
