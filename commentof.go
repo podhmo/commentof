@@ -7,29 +7,47 @@ import (
 	"github.com/podhmo/commentof/collect"
 )
 
-func Package(fset *token.FileSet, t *ast.Package) (*collect.Package, error) {
+func Package(fset *token.FileSet, t *ast.Package, options ...Option) (*collect.Package, error) {
+	b := defaultBuilder()
+	for _, opt := range options {
+		opt(b)
+	}
+
 	c := &collect.Collector{Fset: fset, Dot: ".", Sharp: "#"}
-	p := collect.NewPackage()
+	p := b.Package
 	if err := c.CollectFromPackage(p, t); err != nil {
 		return p, err
-	}
-	b := &collect.PackageBuilder{
-		Package:           p,
-		EnableMergeMethod: true,
 	}
 	return b.Build(), nil
 }
 
-func File(fset *token.FileSet, t *ast.File) (*collect.Package, error) {
+func File(fset *token.FileSet, t *ast.File, options ...Option) (*collect.Package, error) {
+	b := defaultBuilder()
+	for _, opt := range options {
+		opt(b)
+	}
+
 	c := &collect.Collector{Fset: fset, Dot: ".", Sharp: "#"}
 	f := collect.NewFile()
 	if err := c.CollectFromFile(f, t); err != nil {
 		return nil, err
 	}
-	b := &collect.PackageBuilder{
-		Package:           collect.NewPackage(),
-		EnableMergeMethod: true,
-	}
 	b.AddFile(f, fset.File(t.Pos()).Name())
 	return b.Build(), nil
+}
+
+func defaultBuilder() *collect.PackageBuilder {
+	return &collect.PackageBuilder{
+		Package:           collect.NewPackage(),
+		EnableMergeMethod: true,
+		IgnoreExported:    true,
+	}
+}
+
+type Option func(*collect.PackageBuilder)
+
+func WithIncludeUnexported(ok bool) Option {
+	return func(b *collect.PackageBuilder) {
+		b.IgnoreExported = !ok
+	}
 }
