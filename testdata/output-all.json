@@ -18,8 +18,17 @@
 		},
 		"Ob": {
 			"name": "Ob",
-			"fields": {},
-			"fieldnames": [],
+			"fields": {
+				"name": {
+					"name": "name",
+					"embedded": false,
+					"doc": "",
+					"comment": ""
+				}
+			},
+			"fieldnames": [
+				"name"
+			],
 			"methods": {
 				"MarshalJSON": {
 					"name": "MarshalJSON",
@@ -114,13 +123,20 @@
 					},
 					"doc": "Nested is struct @SS0\n",
 					"comment": "Nested is struct @SS1\n"
+				},
+				"unexportedString": {
+					"name": "unexportedString",
+					"embedded": false,
+					"doc": "unexportedString is unexported string @U1  :IGNORED:\n",
+					"comment": ""
 				}
 			},
 			"fieldnames": [
 				"ExportedString",
 				"ExportedString2",
 				"ExportedString3",
-				"Nested"
+				"Nested",
+				"unexportedString"
 			],
 			"doc": "S is struct @S0\n",
 			"comment": "S is struct @S1\n"
@@ -147,6 +163,22 @@
 			],
 			"doc": "S10 is struct @S10\n",
 			"comment": ""
+		},
+		"StructInTestFile": {
+			"name": "StructInTestFile",
+			"fields": {
+				"Name": {
+					"name": "Name",
+					"embedded": false,
+					"doc": "",
+					"comment": ""
+				}
+			},
+			"fieldnames": [
+				"Name"
+			],
+			"doc": "",
+			"comment": ""
 		}
 	},
 	"interfaces": {
@@ -170,12 +202,19 @@
 					"embedded": false,
 					"doc": "Exported3 is exported method @IF2\n",
 					"comment": "Exported3 is exported method  @IF3\n"
+				},
+				"unexported": {
+					"name": "unexported",
+					"embedded": false,
+					"doc": "unexported is unexported method @IUF0 :IGNORED:\n",
+					"comment": ""
 				}
 			},
 			"fieldnames": [
 				"Exported",
 				"Exported2",
-				"Exported3"
+				"Exported3",
+				"unexported"
 			],
 			"doc": "I is interface @I0\n",
 			"comment": "I is interface @I1\n"
@@ -188,10 +227,17 @@
 					"embedded": true,
 					"doc": "embedded I @IF4\n",
 					"comment": "embedded I @IF5\n"
+				},
+				"fmt.Stringer": {
+					"name": "fmt.Stringer",
+					"embedded": true,
+					"doc": "embedded fmt.Stringer @IF6\n",
+					"comment": ""
 				}
 			},
 			"fieldnames": [
-				"I"
+				"I",
+				"fmt.Stringer"
 			],
 			"doc": "I2 is interface @I2\n",
 			"comment": ""
@@ -204,10 +250,40 @@
 					"embedded": true,
 					"doc": "",
 					"comment": ""
+				},
+				"anon#1": {
+					"name": "",
+					"embedded": true,
+					"annonymous": {
+						"name": "I3.",
+						"fields": {
+							"Nested": {
+								"name": "Nested",
+								"embedded": false,
+								"doc": "Nested is exported method @IFF0\n",
+								"comment": ""
+							},
+							"Nested2": {
+								"name": "Nested2",
+								"embedded": false,
+								"doc": "",
+								"comment": "Nested is exported method @IFF1\n"
+							}
+						},
+						"fieldnames": [
+							"Nested",
+							"Nested2"
+						],
+						"doc": "",
+						"comment": "embedded anonymous @IF7\n"
+					},
+					"doc": "",
+					"comment": "embedded anonymous @IF7\n"
 				}
 			},
 			"fieldnames": [
-				"I"
+				"I",
+				"anon#1"
 			],
 			"doc": "I3 is interface @I3\n",
 			"comment": ""
@@ -417,7 +493,8 @@
 		"testdata/fixture/func.go",
 		"testdata/fixture/interface.go",
 		"testdata/fixture/method.go",
-		"testdata/fixture/struct.go"
+		"testdata/fixture/struct.go",
+		"testdata/fixture/testfile_test.go"
 	],
 	"names": [
 		"Base",
@@ -435,6 +512,7 @@
 		"S",
 		"S.Nested",
 		"S2",
-		"S3"
+		"S3",
+		"StructInTestFile"
 	]
 }
