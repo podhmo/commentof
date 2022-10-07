@@ -2,7 +2,6 @@ package fixture
 
 import (
 	"context"
-	"io"
 )
 
 // F is function @FUN0
@@ -40,6 +39,3 @@ func F4(x int /* x of F4 @arg4 :IGNORED:*/ /* x of F4 @arg5 :IGNORED:*/, y /* y 
 func F5() {
 
 }
-
-// EmitFunc is function @FUN6
-type EmitFunc func(ctx context.Context, w io.Writer) error
