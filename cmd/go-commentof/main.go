@@ -40,7 +40,7 @@ func main() {
 	}
 
 	fset := token.NewFileSet()
-	for _, filename := range os.Args[1:] {
+	for _, filename := range flag.Args() {
 		if filename == "-" {
 			continue
 		}
