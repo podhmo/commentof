@@ -4,7 +4,6 @@ import "go/token"
 
 type Package struct {
 	Files      map[string]*File   `json:"-"`
-	Structs    map[string]*Object `json:"structs"`
 	Interfaces map[string]*Object `json:"interfaces"`
 	Functions  map[string]*Func   `json:"functions"`
 	Types      map[string]*Object `json:"types"`
@@ -16,7 +15,6 @@ type Package struct {
 func NewPackage() *Package {
 	return &Package{
 		Files: map[string]*File{}, FileNames: []string{},
-		Structs:    map[string]*Object{},
 		Interfaces: map[string]*Object{},
 		Functions:  map[string]*Func{},
 		Types:      map[string]*Object{},
@@ -25,7 +23,6 @@ func NewPackage() *Package {
 }
 
 type File struct {
-	Structs    map[string]*Object `json:"structs"`
 	Interfaces map[string]*Object `json:"interfaces"`
 	Functions  map[string]*Func   `json:"functions"`
 	Types      map[string]*Object `json:"types"`
@@ -34,7 +31,6 @@ type File struct {
 
 func NewFile() *File {
 	return &File{
-		Structs:    map[string]*Object{},
 		Interfaces: map[string]*Object{},
 		Functions:  map[string]*Func{},
 		Types:      map[string]*Object{},

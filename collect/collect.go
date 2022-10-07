@@ -220,7 +220,7 @@ func (c *Collector) CollectFromTypeSpec(f *File, decl *ast.GenDecl, spec *ast.Ty
 		f.Types[name] = s
 	case *ast.StructType:
 		// type <S> struct { ... }
-		f.Structs[name] = s
+		f.Types[name] = s
 		if err := c.CollectFromStructType(f, s, decl, spec, typ); err != nil {
 			return err
 		}
