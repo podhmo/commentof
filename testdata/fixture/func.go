@@ -1,6 +1,9 @@
 package fixture
 
-import "context"
+import (
+	"context"
+	"io"
+)
 
 // F is function @FUN0
 func F(x int, y string, args ...interface{}) (string, error) {
@@ -37,3 +40,6 @@ func F4(x int /* x of F4 @arg4 :IGNORED:*/ /* x of F4 @arg5 :IGNORED:*/, y /* y 
 func F5() {
 
 }
+
+// EmitFunc is function @FUN6
+type EmitFunc func(ctx context.Context, w io.Writer) error
