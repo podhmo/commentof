@@ -19,8 +19,8 @@ func (b *PackageBuilder) AddFile(f *File, filename string) {
 	p.Files[filename] = f
 
 	p.Names = append(p.Names, f.Names...)
-	for id, s := range f.Structs {
-		p.Structs[id] = s
+	for id, s := range f.Types {
+		p.Types[id] = s
 	}
 	for id, s := range f.Interfaces {
 		p.Interfaces[id] = s
@@ -49,7 +49,7 @@ func mergeMethod(p *Package) {
 		}
 		method := p.Functions[name]
 		obName := strings.TrimPrefix(method.Recv, "*")
-		if ob, ok := p.Structs[obName]; ok {
+		if ob, ok := p.Types[obName]; ok {
 			ob.MethodNames = append(ob.MethodNames, method.Name)
 			ob.Methods[method.Name] = method
 			delete(p.Functions, name)
@@ -69,8 +69,8 @@ func ignoreExported(p *Package) {
 		if _, ok := p.Functions[name]; ok {
 			delete(p.Functions, name)
 			continue
-		} else if _, ok := p.Structs[name]; ok {
-			delete(p.Structs, name)
+		} else if _, ok := p.Types[name]; ok {
+			delete(p.Types, name)
 			continue
 		} else if _, ok := p.Interfaces[name]; ok {
 			delete(p.Interfaces, name)
@@ -88,7 +88,7 @@ func ignoreExportedForFile(f *File) {
 	for _, name := range f.Names {
 		if ast.IsExported(name) {
 			names = append(names, name)
-			if ob, ok := f.Structs[name]; ok {
+			if ob, ok := f.Types[name]; ok {
 				ignoreExportedForObject(ob)
 			} else if ob, ok := f.Interfaces[name]; ok {
 				ignoreExportedForObject(ob)
@@ -98,8 +98,8 @@ func ignoreExportedForFile(f *File) {
 			continue
 		}
 
-		if _, ok := f.Structs[name]; ok {
-			delete(f.Structs, name)
+		if _, ok := f.Types[name]; ok {
+			delete(f.Types, name)
 			continue
 		} else if _, ok := f.Interfaces[name]; ok {
 			delete(f.Interfaces, name)

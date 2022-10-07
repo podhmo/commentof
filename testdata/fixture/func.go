@@ -1,6 +1,8 @@
 package fixture
 
-import "context"
+import (
+	"context"
+)
 
 // F is function @FUN0
 func F(x int, y string, args ...interface{}) (string, error) {
