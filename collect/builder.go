@@ -28,6 +28,9 @@ func (b *PackageBuilder) AddFile(f *File, filename string) {
 	for id, s := range f.Functions {
 		p.Functions[id] = s
 	}
+	for id, s := range f.Types {
+		p.Types[id] = s
+	}
 }
 
 func (b *PackageBuilder) Build() *Package {
@@ -75,6 +78,9 @@ func ignoreExported(p *Package) {
 		} else if _, ok := p.Interfaces[name]; ok {
 			delete(p.Interfaces, name)
 			continue
+		} else if _, ok := p.Types[name]; ok {
+			delete(p.Types, name)
+			continue
 		}
 	}
 	p.Names = names
@@ -106,6 +112,9 @@ func ignoreExportedForFile(f *File) {
 			continue
 		} else if _, ok := f.Functions[name]; ok {
 			delete(f.Functions, name)
+			continue
+		} else if _, ok := f.Types[name]; ok {
+			delete(f.Types, name)
 			continue
 		}
 	}

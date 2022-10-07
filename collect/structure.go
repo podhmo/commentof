@@ -7,6 +7,7 @@ type Package struct {
 	Structs    map[string]*Object `json:"structs"`
 	Interfaces map[string]*Object `json:"interfaces"`
 	Functions  map[string]*Func   `json:"functions"`
+	Types      map[string]*Object `json:"types"`
 
 	FileNames []string `json:"filenames"`
 	Names     []string `json:"names"`
@@ -18,6 +19,7 @@ func NewPackage() *Package {
 		Structs:    map[string]*Object{},
 		Interfaces: map[string]*Object{},
 		Functions:  map[string]*Func{},
+		Types:      map[string]*Object{},
 		Names:      []string{},
 	}
 }
@@ -26,8 +28,8 @@ type File struct {
 	Structs    map[string]*Object `json:"structs"`
 	Interfaces map[string]*Object `json:"interfaces"`
 	Functions  map[string]*Func   `json:"functions"`
-
-	Names []string `json:"names"`
+	Types      map[string]*Object `json:"types"`
+	Names      []string           `json:"names"`
 }
 
 func NewFile() *File {
@@ -35,6 +37,7 @@ func NewFile() *File {
 		Structs:    map[string]*Object{},
 		Interfaces: map[string]*Object{},
 		Functions:  map[string]*Func{},
+		Types:      map[string]*Object{},
 		Names:      []string{},
 	}
 }
@@ -58,8 +61,8 @@ type Object struct {
 	Token  token.Token `json:"-"`
 	Parent *Object     `json:"-"`
 
-	Fields     map[string]*Field `json:"fields"`
-	FieldNames []string          `json:"fieldnames"`
+	Fields     map[string]*Field `json:"fields,omitempty"`
+	FieldNames []string          `json:"fieldnames,omitempty"`
 
 	Methods     map[string]*Func `json:"methods,omitempty"`
 	MethodNames []string         `json:"methodnames,omitempty"`

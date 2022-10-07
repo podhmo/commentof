@@ -217,6 +217,7 @@ func (c *Collector) CollectFromTypeSpec(f *File, decl *ast.GenDecl, spec *ast.Ty
 	case *ast.Ident:
 		// type <S> <S>
 		// type <S> = <S>
+		f.Types[name] = s
 	case *ast.StructType:
 		// type <S> struct { ... }
 		f.Structs[name] = s
@@ -229,6 +230,8 @@ func (c *Collector) CollectFromTypeSpec(f *File, decl *ast.GenDecl, spec *ast.Ty
 		if err := c.CollectFromInterfaceType(f, s, decl, spec, typ); err != nil {
 			return err
 		}
+	case *ast.FuncType:
+		f.Types[name] = s
 	default:
 		log.Printf("unexpected decl: %T, spec: %T, type: %T?", decl, spec, typ)
 	}
