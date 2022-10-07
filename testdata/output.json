@@ -1,152 +1,4 @@
 {
-	"structs": {
-		"Base": {
-			"name": "Base",
-			"fields": {
-				"ExportedString": {
-					"name": "ExportedString",
-					"embedded": false,
-					"doc": "ExportedString is exported string @F10\n",
-					"comment": ""
-				}
-			},
-			"fieldnames": [
-				"ExportedString"
-			],
-			"doc": "Base is struct @S10\n",
-			"comment": ""
-		},
-		"Ob": {
-			"name": "Ob",
-			"methods": {
-				"MarshalJSON": {
-					"name": "MarshalJSON",
-					"recv": "*Ob",
-					"params": {},
-					"paramnames": [],
-					"returns": {
-						"ret#0": {
-							"name": "",
-							"embedded": false,
-							"doc": "",
-							"comment": ""
-						},
-						"ret#1": {
-							"name": "",
-							"embedded": false,
-							"doc": "",
-							"comment": ""
-						}
-					},
-					"returnnames": [
-						"ret#0",
-						"ret#1"
-					],
-					"doc": ""
-				},
-				"Name": {
-					"name": "Name",
-					"recv": "Ob",
-					"params": {},
-					"paramnames": [],
-					"returns": {
-						"ret#0": {
-							"name": "",
-							"embedded": false,
-							"doc": "",
-							"comment": ""
-						}
-					},
-					"returnnames": [
-						"ret#0"
-					],
-					"doc": ""
-				}
-			},
-			"methodnames": [
-				"Name",
-				"MarshalJSON"
-			],
-			"doc": "",
-			"comment": ""
-		},
-		"S": {
-			"name": "S",
-			"fields": {
-				"ExportedString": {
-					"name": "ExportedString",
-					"embedded": false,
-					"doc": "ExportedString is exported string @F0\n",
-					"comment": ""
-				},
-				"ExportedString2": {
-					"name": "ExportedString2",
-					"embedded": false,
-					"doc": "",
-					"comment": "ExportedString2 is exported string @F1\n"
-				},
-				"ExportedString3": {
-					"name": "ExportedString3",
-					"embedded": false,
-					"doc": "ExportedString3 is exported string @F2\n",
-					"comment": "ExportedString3 is exported string @F3\n"
-				},
-				"Nested": {
-					"name": "Nested",
-					"embedded": false,
-					"annonymous": {
-						"name": "S.Nested",
-						"fields": {
-							"ExportedString": {
-								"name": "ExportedString",
-								"embedded": false,
-								"doc": "ExportedString is exported string @FF0\n",
-								"comment": "ExportedString is exported string @FF1\n"
-							}
-						},
-						"fieldnames": [
-							"ExportedString"
-						],
-						"doc": "Nested is struct @SS0\n",
-						"comment": "Nested is struct @SS1\n"
-					},
-					"doc": "Nested is struct @SS0\n",
-					"comment": "Nested is struct @SS1\n"
-				}
-			},
-			"fieldnames": [
-				"ExportedString",
-				"ExportedString2",
-				"ExportedString3",
-				"Nested"
-			],
-			"doc": "S is struct @S0\n",
-			"comment": "S is struct @S1\n"
-		},
-		"S10": {
-			"name": "S10",
-			"fields": {
-				"Base": {
-					"name": "Base",
-					"embedded": true,
-					"doc": "",
-					"comment": ""
-				},
-				"ExportedString2": {
-					"name": "ExportedString2",
-					"embedded": false,
-					"doc": "ExportedString2 is exported string @F11\n",
-					"comment": ""
-				}
-			},
-			"fieldnames": [
-				"Base",
-				"ExportedString2"
-			],
-			"doc": "S10 is struct @S10\n",
-			"comment": ""
-		}
-	},
 	"interfaces": {
 		"I": {
 			"name": "I",
@@ -410,6 +262,22 @@
 		}
 	},
 	"types": {
+		"Base": {
+			"name": "Base",
+			"fields": {
+				"ExportedString": {
+					"name": "ExportedString",
+					"embedded": false,
+					"doc": "ExportedString is exported string @F10\n",
+					"comment": ""
+				}
+			},
+			"fieldnames": [
+				"ExportedString"
+			],
+			"doc": "Base is struct @S10\n",
+			"comment": ""
+		},
 		"EmitFunc": {
 			"name": "EmitFunc",
 			"doc": "EmitFunc is function\n",
@@ -423,6 +291,136 @@
 		"MyInt": {
 			"name": "MyInt",
 			"doc": "MyInt is new type\n",
+			"comment": ""
+		},
+		"Ob": {
+			"name": "Ob",
+			"methods": {
+				"MarshalJSON": {
+					"name": "MarshalJSON",
+					"recv": "*Ob",
+					"params": {},
+					"paramnames": [],
+					"returns": {
+						"ret#0": {
+							"name": "",
+							"embedded": false,
+							"doc": "",
+							"comment": ""
+						},
+						"ret#1": {
+							"name": "",
+							"embedded": false,
+							"doc": "",
+							"comment": ""
+						}
+					},
+					"returnnames": [
+						"ret#0",
+						"ret#1"
+					],
+					"doc": ""
+				},
+				"Name": {
+					"name": "Name",
+					"recv": "Ob",
+					"params": {},
+					"paramnames": [],
+					"returns": {
+						"ret#0": {
+							"name": "",
+							"embedded": false,
+							"doc": "",
+							"comment": ""
+						}
+					},
+					"returnnames": [
+						"ret#0"
+					],
+					"doc": ""
+				}
+			},
+			"methodnames": [
+				"Name",
+				"MarshalJSON"
+			],
+			"doc": "",
+			"comment": ""
+		},
+		"S": {
+			"name": "S",
+			"fields": {
+				"ExportedString": {
+					"name": "ExportedString",
+					"embedded": false,
+					"doc": "ExportedString is exported string @F0\n",
+					"comment": ""
+				},
+				"ExportedString2": {
+					"name": "ExportedString2",
+					"embedded": false,
+					"doc": "",
+					"comment": "ExportedString2 is exported string @F1\n"
+				},
+				"ExportedString3": {
+					"name": "ExportedString3",
+					"embedded": false,
+					"doc": "ExportedString3 is exported string @F2\n",
+					"comment": "ExportedString3 is exported string @F3\n"
+				},
+				"Nested": {
+					"name": "Nested",
+					"embedded": false,
+					"annonymous": {
+						"name": "S.Nested",
+						"fields": {
+							"ExportedString": {
+								"name": "ExportedString",
+								"embedded": false,
+								"doc": "ExportedString is exported string @FF0\n",
+								"comment": "ExportedString is exported string @FF1\n"
+							}
+						},
+						"fieldnames": [
+							"ExportedString"
+						],
+						"doc": "Nested is struct @SS0\n",
+						"comment": "Nested is struct @SS1\n"
+					},
+					"doc": "Nested is struct @SS0\n",
+					"comment": "Nested is struct @SS1\n"
+				}
+			},
+			"fieldnames": [
+				"ExportedString",
+				"ExportedString2",
+				"ExportedString3",
+				"Nested"
+			],
+			"doc": "S is struct @S0\n",
+			"comment": "S is struct @S1\n"
+		},
+		"S10": {
+			"name": "S10",
+			"fields": {
+				"Base": {
+					"name": "Base",
+					"embedded": true,
+					"doc": "",
+					"comment": ""
+				},
+				"ExportedString2": {
+					"name": "ExportedString2",
+					"embedded": false,
+					"doc": "ExportedString2 is exported string @F11\n",
+					"comment": ""
+				}
+			},
+			"fieldnames": [
+				"Base",
+				"ExportedString2"
+			],
+			"doc": "S10 is struct @S10\n",
 			"comment": ""
 		},
 		"S2": {
