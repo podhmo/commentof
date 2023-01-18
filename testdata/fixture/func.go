@@ -44,6 +44,6 @@ func F5() {
 var F6 = func(x int, y int) error { return nil }
 
 // F7 is function @FUN7
-func F7(ctx context.Context, x, y int, x string) (x, y error) {
+func F7(ctx context.Context, x, y int, z string) (x, y error) {
 	return
 }
