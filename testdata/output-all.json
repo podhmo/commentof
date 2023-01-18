@@ -303,6 +303,60 @@
 			"returns": {},
 			"returnnames": [],
 			"doc": "F5 is function @FUN5\n"
+		},
+		"F7": {
+			"name": "F7",
+			"params": {
+				"ctx": {
+					"name": "ctx",
+					"embedded": false,
+					"doc": "",
+					"comment": ""
+				},
+				"x": {
+					"name": "x",
+					"embedded": false,
+					"doc": "",
+					"comment": ""
+				},
+				"y": {
+					"name": "y",
+					"embedded": false,
+					"doc": "",
+					"comment": ""
+				},
+				"z": {
+					"name": "z",
+					"embedded": false,
+					"doc": "",
+					"comment": ""
+				}
+			},
+			"paramnames": [
+				"ctx",
+				"x",
+				"y",
+				"z"
+			],
+			"returns": {
+				"x": {
+					"name": "x",
+					"embedded": false,
+					"doc": "",
+					"comment": ""
+				},
+				"y": {
+					"name": "y",
+					"embedded": false,
+					"doc": "",
+					"comment": ""
+				}
+			},
+			"returnnames": [
+				"x",
+				"y"
+			],
+			"doc": "F7 is function @FUN7\n"
 		}
 	},
 	"types": {
@@ -530,6 +584,7 @@
 		"F3",
 		"F4",
 		"F5",
+		"F7",
 		"I",
 		"I2",
 		"I3",

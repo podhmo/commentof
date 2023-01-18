@@ -39,3 +39,11 @@ func F4(x int /* x of F4 @arg4 :IGNORED:*/ /* x of F4 @arg5 :IGNORED:*/, y /* y 
 func F5() {
 
 }
+
+// F6 is function (anonymous) @FUN6
+var F6 = func(x int, y int) error { return nil }
+
+// F7 is function @FUN7
+func F7(ctx context.Context, x, y int, z string) (x, y error) {
+	return
+}
