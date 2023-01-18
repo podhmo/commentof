@@ -119,6 +119,16 @@ func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl
 			Name:    name,
 			Comment: doc,
 		}
+
+		if len(x.Names) > 0 {
+			for _, id := range x.Names[1:] {
+				name := id.Name
+				paramNames = append(paramNames, name)
+				params[name] = &Field{
+					Name: name,
+				}
+			}
+		}
 	}
 
 	returnNames := []string{}
@@ -167,6 +177,13 @@ func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl
 			returns[id] = &Field{
 				Name:    name,
 				Comment: doc,
+			}
+			if len(x.Names) > 0 {
+				for _, id := range x.Names[1:] {
+					name := id.Name
+					returnNames = append(returnNames, name)
+					returns[name] = &Field{Name: name}
+				}
 			}
 		}
 	}
