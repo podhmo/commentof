@@ -318,12 +318,25 @@
 					"embedded": false,
 					"doc": "",
 					"comment": ""
+				},
+				"y": {
+					"name": "y",
+					"embedded": false,
+					"doc": "",
+					"comment": ""
+				},
+				"z": {
+					"name": "z",
+					"embedded": false,
+					"doc": "",
+					"comment": ""
 				}
 			},
 			"paramnames": [
 				"ctx",
 				"x",
-				"x"
+				"y",
+				"z"
 			],
 			"returns": {
 				"x": {
@@ -331,10 +344,17 @@
 					"embedded": false,
 					"doc": "",
 					"comment": ""
+				},
+				"y": {
+					"name": "y",
+					"embedded": false,
+					"doc": "",
+					"comment": ""
 				}
 			},
 			"returnnames": [
-				"x"
+				"x",
+				"y"
 			],
 			"doc": "F7 is function @FUN7\n"
 		}
