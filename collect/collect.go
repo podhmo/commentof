@@ -157,7 +157,7 @@ func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl
 				start = decl.Type.Results.List[0].Pos()
 			}
 			end := decl.Type.Results.Closing
-			if end == 0 {
+			if end == 0 && decl.Body != nil {
 				end = decl.Body.Pos()
 			}
 			for _, cg := range t.Comments[idx:] {
