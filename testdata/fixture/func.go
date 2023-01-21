@@ -50,8 +50,8 @@ func F7(ctx context.Context, x, y int, z string) (x, y error) {
 
 // F8 is function @FUN8
 func F8(
-	ctx context.Context, //
-	x, y int, //
+	ctx context.Context,
+	x, y int,
 	pretty *bool, // pretty output or not
 ) []int {
 	return nil
