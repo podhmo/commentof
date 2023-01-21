@@ -153,7 +153,13 @@ func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl
 		sameCommentFields = make(map[token.Pos][]*Field, len(decl.Type.Results.List))
 		{
 			start := decl.Type.Results.Opening
+			if start == 0 {
+				start = decl.Type.Results.List[0].Pos()
+			}
 			end := decl.Type.Results.Closing
+			if end == 0 {
+				end = decl.Body.Pos()
+			}
 			for _, cg := range t.Comments[idx:] {
 				if cg.End() < start {
 					continue
@@ -179,20 +185,20 @@ func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl
 			doc := ""
 			commentPos := token.Pos(0)
 			for _, cg := range comments {
-				// fmt.Println(f.Names[len(f.Names)-1], id, "@@", x.Pos(), x.End(), "@", cg.Pos(), cg.End(), "--", strings.TrimSpace(cg.Text()))
+				// fmt.Fprintln(os.Stderr, f.Names[len(f.Names)-1], id, "@@", x.Pos(), x.End(), "@", cg.Pos(), cg.End(), "--", strings.TrimSpace(cg.Text()))
 				if x.Pos() < cg.Pos() && cg.End() < x.End() {
 					if commentPos == 0 {
 						commentPos = cg.Pos()
 					}
 					doc += cg.Text()
-					// fmt.Println(f.Names[len(f.Names)-1], id, "-#", x.Pos(), x.End(), "@", cg.Pos(), cg.End(), "--", strings.TrimSpace(cg.Text()))
+					// fmt.Fprintln(os.Stderr, f.Names[len(f.Names)-1], id, "-#", x.Pos(), x.End(), "@", cg.Pos(), cg.End(), "--", strings.TrimSpace(cg.Text()))
 					continue
 				}
 				if x.End() < cg.Pos() {
 					if commentPos == 0 {
 						commentPos = cg.Pos()
 					}
-					// fmt.Println(f.Names[len(f.Names)-1], id, "--", x.Pos(), x.End(), "@", cg.Pos(), cg.End(), "--", strings.TrimSpace(cg.Text()))
+					// fmt.Fprintln(os.Stderr, f.Names[len(f.Names)-1], id, "--", x.Pos(), x.End(), "@", cg.Pos(), cg.End(), "--", strings.TrimSpace(cg.Text()))
 					doc += cg.Text()
 					break
 				}
