@@ -53,6 +53,12 @@ func F8(
 	ctx context.Context,
 	x, y int,
 	pretty *bool, // pretty output or not
-) []int {
+) []int /* ret */ {
+	return nil
+}
+
+// F9 is function @FUN9
+func F9(
+	ctx context.Context, x, y int, pretty *bool /* pretty output or not */) ([]int /* ret */, err /* error */) {
 	return nil
 }
