@@ -47,3 +47,18 @@ var F6 = func(x int, y int) error { return nil }
 func F7(ctx context.Context, x, y int, z string) (x, y error) {
 	return
 }
+
+// F8 is function @FUN8
+func F8(
+	ctx context.Context,
+	x, y int,
+	pretty *bool, // pretty output or not
+) []int /* ret */ {
+	return nil
+}
+
+// F9 is function @FUN9
+func F9(
+	ctx context.Context, x, y int, pretty *bool /* pretty output or not */) ([]int /* ret */, err /* error */) {
+	return nil
+}

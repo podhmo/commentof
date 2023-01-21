@@ -74,5 +74,4 @@ type Field struct {
 
 	Doc     string `json:"doc"`     // associated documentation; or nil
 	Comment string `json:"comment"` // line comments; or nil
-	// TODO: tag
 }

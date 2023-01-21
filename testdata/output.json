@@ -313,6 +313,107 @@
 				"y"
 			],
 			"doc": "F7 is function @FUN7\n"
+		},
+		"F8": {
+			"name": "F8",
+			"params": {
+				"ctx": {
+					"name": "ctx",
+					"embedded": false,
+					"doc": "",
+					"comment": ""
+				},
+				"pretty": {
+					"name": "pretty",
+					"embedded": false,
+					"doc": "",
+					"comment": "pretty output or not\n"
+				},
+				"x": {
+					"name": "x",
+					"embedded": false,
+					"doc": "",
+					"comment": ""
+				},
+				"y": {
+					"name": "y",
+					"embedded": false,
+					"doc": "",
+					"comment": ""
+				}
+			},
+			"paramnames": [
+				"ctx",
+				"x",
+				"y",
+				"pretty"
+			],
+			"returns": {
+				"ret#0": {
+					"name": "",
+					"embedded": false,
+					"doc": "",
+					"comment": " ret\n"
+				}
+			},
+			"returnnames": [
+				"ret#0"
+			],
+			"doc": "F8 is function @FUN8\n"
+		},
+		"F9": {
+			"name": "F9",
+			"params": {
+				"ctx": {
+					"name": "ctx",
+					"embedded": false,
+					"doc": "",
+					"comment": ""
+				},
+				"pretty": {
+					"name": "pretty",
+					"embedded": false,
+					"doc": "",
+					"comment": " pretty output or not\n"
+				},
+				"x": {
+					"name": "x",
+					"embedded": false,
+					"doc": "",
+					"comment": ""
+				},
+				"y": {
+					"name": "y",
+					"embedded": false,
+					"doc": "",
+					"comment": ""
+				}
+			},
+			"paramnames": [
+				"ctx",
+				"x",
+				"y",
+				"pretty"
+			],
+			"returns": {
+				"ret#0": {
+					"name": "",
+					"embedded": false,
+					"doc": "",
+					"comment": " ret\n"
+				},
+				"ret#1": {
+					"name": "",
+					"embedded": false,
+					"doc": "",
+					"comment": " error\n"
+				}
+			},
+			"returnnames": [
+				"ret#0",
+				"ret#1"
+			],
+			"doc": "F9 is function @FUN9\n"
 		}
 	},
 	"types": {
@@ -506,6 +607,8 @@
 		"F4",
 		"F5",
 		"F7",
+		"F8",
+		"F9",
 		"I",
 		"I2",
 		"I3",
