@@ -125,6 +125,7 @@ func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl
 		paramNames = append(paramNames, id)
 		field := &Field{
 			Name:    name,
+			Pos:     x.Pos(),
 			Comment: doc,
 		}
 		params[id] = field
@@ -205,6 +206,7 @@ func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl
 			}
 			field := &Field{
 				Name:    name,
+				Pos:     x.Pos(),
 				Comment: doc,
 			}
 			returns[id] = field
@@ -337,6 +339,7 @@ func (c *Collector) CollectFromStructType(f *File, s *Object, decl *ast.GenDecl,
 		s.FieldNames = append(s.FieldNames, id)
 		fieldof := &Field{
 			Name:     name,
+			Pos:      field.Pos(),
 			Doc:      field.Doc.Text(),
 			Comment:  field.Comment.Text(),
 			Embedded: anonymous,
@@ -413,6 +416,7 @@ func (c *Collector) CollectFromInterfaceType(f *File, s *Object, decl *ast.GenDe
 		s.FieldNames = append(s.FieldNames, id)
 		fieldof := &Field{
 			Name:     name,
+			Pos:      field.Pos(),
 			Doc:      field.Doc.Text(),
 			Comment:  field.Comment.Text(),
 			Embedded: anonymous,
