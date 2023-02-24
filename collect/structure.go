@@ -39,7 +39,8 @@ func NewFile() *File {
 }
 
 type Func struct {
-	Name string `json:"name"`
+	Name string    `json:"name"`
+	Pos  token.Pos `json:"-"`
 
 	Recv string `json:"recv,omitempty"`
 
@@ -54,6 +55,7 @@ type Func struct {
 
 type Object struct {
 	Name   string      `json:"name"`
+	Pos    token.Pos   `json:"-"`
 	Token  token.Token `json:"-"`
 	Parent *Object     `json:"-"`
 
@@ -68,9 +70,10 @@ type Object struct {
 }
 
 type Field struct {
-	Name      string  `json:"name"`
-	Embedded  bool    `json:"embedded"`
-	Anonymous *Object `json:"annonymous,omitempty"`
+	Name      string    `json:"name"`
+	Pos       token.Pos `json:"-"`
+	Embedded  bool      `json:"embedded"`
+	Anonymous *Object   `json:"annonymous,omitempty"`
 
 	Doc     string `json:"doc"`     // associated documentation; or nil
 	Comment string `json:"comment"` // line comments; or nil
