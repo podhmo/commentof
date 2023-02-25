@@ -125,6 +125,7 @@ func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl
 		paramNames = append(paramNames, id)
 		field := &Field{
 			Name:    name,
+			Pos:     x.Pos(),
 			Comment: doc,
 		}
 		params[id] = field
@@ -205,6 +206,7 @@ func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl
 			}
 			field := &Field{
 				Name:    name,
+				Pos:     x.Pos(),
 				Comment: doc,
 			}
 			returns[id] = field
@@ -227,6 +229,7 @@ func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl
 
 	f.Functions[id] = &Func{
 		Name:        name,
+		Pos:         decl.Pos(),
 		Recv:        recv,
 		Doc:         decl.Doc.Text(),
 		Params:      params,
@@ -258,6 +261,7 @@ func (c *Collector) CollectFromTypeSpec(f *File, decl *ast.GenDecl, spec *ast.Ty
 	f.Names = append(f.Names, name)
 	s := &Object{
 		Name:       name,
+		Pos:        decl.Pos(),
 		Doc:        spec.Doc.Text(),
 		Comment:    spec.Comment.Text(),
 		FieldNames: []string{},
@@ -335,6 +339,7 @@ func (c *Collector) CollectFromStructType(f *File, s *Object, decl *ast.GenDecl,
 		s.FieldNames = append(s.FieldNames, id)
 		fieldof := &Field{
 			Name:     name,
+			Pos:      field.Pos(),
 			Doc:      field.Doc.Text(),
 			Comment:  field.Comment.Text(),
 			Embedded: anonymous,
@@ -349,6 +354,7 @@ func (c *Collector) CollectFromStructType(f *File, s *Object, decl *ast.GenDecl,
 			f.Names = append(f.Names, name)
 			anonymous := &Object{
 				Name:       name,
+				Pos:        field.Pos(),
 				Parent:     s,
 				Doc:        field.Doc.Text(),
 				Comment:    field.Comment.Text(),
@@ -410,6 +416,7 @@ func (c *Collector) CollectFromInterfaceType(f *File, s *Object, decl *ast.GenDe
 		s.FieldNames = append(s.FieldNames, id)
 		fieldof := &Field{
 			Name:     name,
+			Pos:      field.Pos(),
 			Doc:      field.Doc.Text(),
 			Comment:  field.Comment.Text(),
 			Embedded: anonymous,
@@ -424,6 +431,7 @@ func (c *Collector) CollectFromInterfaceType(f *File, s *Object, decl *ast.GenDe
 			f.Names = append(f.Names, name)
 			anonymous := &Object{
 				Name:       name,
+				Pos:        field.Pos(),
 				Parent:     s,
 				Doc:        field.Doc.Text(),
 				Comment:    field.Comment.Text(),
