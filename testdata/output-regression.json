@@ -1,0 +1,38 @@
+{
+	"interfaces": {},
+	"functions": {
+		"DeletePet": {
+			"name": "DeletePet",
+			"params": {
+				"input": {
+					"name": "input",
+					"embedded": false,
+					"doc": "",
+					"comment": ""
+				}
+			},
+			"paramnames": [
+				"input"
+			],
+			"returns": {
+				"ret#0": {
+					"name": "",
+					"embedded": false,
+					"doc": "",
+					"comment": " pet deleted\n"
+				}
+			},
+			"returnnames": [
+				"ret#0"
+			],
+			"doc": "Deletes a pet by ID\n\ndeletes a single pet based on the ID supplied\n"
+		}
+	},
+	"types": {},
+	"filenames": [
+		"testdata/regression/issue16.go"
+	],
+	"names": [
+		"DeletePet"
+	]
+}

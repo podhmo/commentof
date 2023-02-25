@@ -195,7 +195,7 @@ func (c *Collector) CollectFromFuncDecl(f *File, t *ast.File, decl *ast.FuncDecl
 					// fmt.Fprintln(os.Stderr, f.Names[len(f.Names)-1], id, "-#", x.Pos(), x.End(), "@", cg.Pos(), cg.End(), "--", strings.TrimSpace(cg.Text()))
 					continue
 				}
-				if x.End() < cg.Pos() {
+				if x.End() <= cg.Pos() {
 					if commentPos == 0 {
 						commentPos = cg.Pos()
 					}
